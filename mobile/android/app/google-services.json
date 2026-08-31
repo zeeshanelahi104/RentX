@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "145461526346",
+    "project_id": "rentx-ef9d0",
+    "storage_bucket": "rentx-ef9d0.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:145461526346:android:d43105f61c42ee3df2cbb3",
+        "android_client_info": {
+          "package_name": "com.rentx.app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC_LM4KJyNAnZJ4WElcg_tlIlwegHkbLzI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

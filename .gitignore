@@ -1,0 +1,20 @@
+# Editors / tooling
+.claude/
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+npm-debug.log*
+
+# Env files (per-project .gitignore also excludes these; kept here as a backstop)
+.env
+.env.local
+.env.*.local
+
+# Dependencies (per-project .gitignore also excludes these; kept here as a backstop)
+node_modules/

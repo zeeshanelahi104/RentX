@@ -1,0 +1,8 @@
+node_modules/
+.gradle/
+*.keystore
+android/app/build/
+android/.gradle/
+ios/build/
+.env
+*.log
