@@ -48,3 +48,7 @@ npm start
 - **Backend**: Node.js, Express, MongoDB (Mongoose), Socket.IO, JWT auth
 - **Admin**: React, React Query, React Router, Chart.js
 - **Integrations**: Firebase (push notifications), Twilio (OTP), Cloudinary (image uploads), Google Sign-In
+
+## Security
+
+See [SECURITY.md](SECURITY.md) — in particular, why the Firebase client keys committed under `mobile/` are expected and safe.
