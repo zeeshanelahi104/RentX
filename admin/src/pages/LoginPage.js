@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import { adminLogin } from '../api';
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
@@ -15,7 +15,7 @@ export default function LoginPage() {
     setLoading(true);
     setError('');
     try {
-      const res = await axios.post('/api/admin/auth/login', { email, password });
+      const res = await adminLogin(email, password);
       localStorage.setItem('rentx_admin_token', res.data.token);
       localStorage.setItem('rentx_admin_user', JSON.stringify(res.data.user));
       navigate('/dashboard');

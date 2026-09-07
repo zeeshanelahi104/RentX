@@ -35,7 +35,27 @@ initSocket(server);
 
 // Security Middleware
 app.use(helmet());
-app.use(cors({ origin: process.env.CLIENT_URL || '*', credentials: true }));
+
+// Allow the admin panel (wherever it's hosted) plus local dev, rather than
+// a single fixed CLIENT_URL — the mobile app doesn't send an Origin header
+// so it's unaffected by this either way.
+const allowedOrigins = [
+  process.env.CLIENT_URL,
+  process.env.ADMIN_URL,
+  'http://localhost:3000',
+  'http://localhost:8081',
+  'https://rococo-torrone-668d1c.netlify.app',
+].filter(Boolean);
+
+app.use(cors({
+  origin: (origin, callback) => {
+    // No Origin header (mobile apps, curl, server-to-server) — always allow.
+    if (!origin) return callback(null, true);
+    if (allowedOrigins.includes(origin)) return callback(null, true);
+    callback(new Error('Not allowed by CORS'));
+  },
+  credentials: true,
+}));
 
 // Rate Limiting
 const limiter = rateLimit({ windowMs: 15 * 60 * 1000, max: 100 });

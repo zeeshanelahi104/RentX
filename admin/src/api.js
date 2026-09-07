@@ -1,13 +1,12 @@
 import axios from 'axios';
 
-// In local dev, CRA's "proxy" field in package.json forwards relative /api
-// calls to the backend — but that only works with `npm start`'s own dev
-// server. A static hosted deploy (Netlify, Vercel, etc.) has no proxy at
-// all, so relative /api calls would just hit the frontend's own domain.
-// REACT_APP_API_URL (see .env.example) is inlined at build time by CRA and
-// lets each deploy target point at its own backend without a code change.
+// Hardcoded rather than relying on CRA's "proxy" field (only works with
+// `npm start`'s own dev server) or a build-time env var (silently falls back
+// to relative "/api" if the hosting platform's redeploy doesn't pick up
+// the env change, which 404s since a static host like Netlify has no /api
+// of its own). This way it's always correct regardless of deploy pipeline.
 const api = axios.create({
-  baseURL: process.env.REACT_APP_API_URL || '/api',
+  baseURL: 'https://rentx-bvm4.onrender.com/api',
 });
 
 api.interceptors.request.use(config => {
