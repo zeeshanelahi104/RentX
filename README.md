@@ -1,6 +1,6 @@
 # RentX
 
-RentX is a full-stack vehicle rental platform connecting riders and drivers. Riders can browse available vehicles, book rentals, chat with drivers in real time, and rate their experience. Drivers can list vehicles, manage bookings, and track earnings.
+RentX is a full-stack vehicle rental platform connecting customers and drivers. Customers can browse available vehicles, book rentals, chat with drivers in real time, and rate their experience. Drivers can list vehicles, manage bookings, and track earnings.
 
 Built with **React Native (Expo)** for the mobile app, **Node.js / Express / MongoDB** for the backend, and a **React** web admin portal — with **Socket.IO** for real-time chat, **Firebase** for push notifications, **Twilio** for phone/OTP verification, and **Google Sign-In** for authentication.
 
@@ -9,7 +9,7 @@ Built with **React Native (Expo)** for the mobile app, **Node.js / Express / Mon
 ```
 RentX/
 ├── backend/   Node.js / Express / MongoDB API
-├── mobile/    React Native (Expo) app for riders and drivers
+├── mobile/    React Native (Expo) app for customers and drivers
 └── admin/     React web admin portal
 ```
 

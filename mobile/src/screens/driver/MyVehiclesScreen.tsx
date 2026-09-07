@@ -1,8 +1,11 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, FlatList, TouchableOpacity, Image, ActivityIndicator } from 'react-native';
+import { View, Text, StyleSheet, FlatList, TouchableOpacity, ActivityIndicator, Dimensions } from 'react-native';
 import { MaterialCommunityIcons as Icon } from '@expo/vector-icons';
 import { COLORS } from '../../constants/colors';
 import { getMyVehicles, updateVehicle } from '../../services/vehicleService';
+import AspectImage from '../../components/AspectImage';
+
+const CARD_WIDTH = Dimensions.get('window').width - 32; // matches FlatList's 16px horizontal padding
 
 export default function MyVehiclesScreen({ navigation }: any) {
   const [vehicles, setVehicles] = useState<any[]>([]);
@@ -25,7 +28,7 @@ export default function MyVehiclesScreen({ navigation }: any) {
 
   const renderVehicle = ({ item }: any) => (
     <View style={styles.card}>
-      <Image source={{ uri: item.photos?.[0] || 'https://via.placeholder.com/300x150' }} style={styles.image} />
+      <AspectImage uri={item.photos?.[0] || 'https://via.placeholder.com/300x150'} width={CARD_WIDTH} />
       <View style={styles.cardBody}>
         <View style={styles.cardTop}>
           <Text style={styles.name}>{item.year} {item.make} {item.model}</Text>
@@ -47,10 +50,12 @@ export default function MyVehiclesScreen({ navigation }: any) {
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <Text style={styles.headerTitle}>میری گاڑیاں</Text>
-        <TouchableOpacity style={styles.addBtn} onPress={() => navigation.navigate('AddVehicle', { onAdded: fetchVehicles })}>
-          <Icon name="plus" size={22} color="#fff" />
-        </TouchableOpacity>
+        <Text style={styles.headerTitle}>میری گاڑی</Text>
+        {vehicles.length === 0 && (
+          <TouchableOpacity style={styles.addBtn} onPress={() => navigation.navigate('AddVehicle', { onAdded: fetchVehicles })}>
+            <Icon name="plus" size={22} color="#fff" />
+          </TouchableOpacity>
+        )}
       </View>
 
       {loading ? (
@@ -84,7 +89,6 @@ const styles = StyleSheet.create({
   headerTitle: { color: '#fff', fontSize: 20, fontWeight: '700' },
   addBtn: { backgroundColor: 'rgba(255,255,255,0.2)', borderRadius: 20, padding: 8 },
   card: { backgroundColor: '#fff', borderRadius: 14, marginBottom: 14, elevation: 2, overflow: 'hidden' },
-  image: { width: '100%', height: 150, resizeMode: 'cover' },
   cardBody: { padding: 14 },
   cardTop: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
   name: { fontSize: 16, fontWeight: '700', color: COLORS.text, flex: 1 },

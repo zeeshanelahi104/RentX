@@ -12,7 +12,7 @@ import { useAuthStore } from '../../store/authStore';
 import { useGoogleAuthRequest, isGoogleAuthConfigured } from '../../utils/googleAuth';
 
 const ROLES = [
-  { id: 'rider', label: 'رائیڈر', labelEn: 'Rider', desc: 'گاڑی بک کریں' },
+  { id: 'customer', label: 'کسٹمر', labelEn: 'Customer', desc: 'گاڑی بک کریں' },
   { id: 'driver', label: 'ڈرائیور', labelEn: 'Driver', desc: 'گاڑی کرایے پر دیں' },
 ];
 
@@ -20,7 +20,10 @@ export default function SignupScreen({ navigation }: any) {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [role, setRole] = useState<'rider' | 'driver'>('rider');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [role, setRole] = useState<'customer' | 'driver'>('customer');
   const [city, setCity] = useState('Chiniot');
   const [loading, setLoading] = useState(false);
   const [fieldErrors, setFieldErrors] = useState<{ email?: string }>({});
@@ -50,6 +53,7 @@ export default function SignupScreen({ navigation }: any) {
     if (!name.trim()) return showAlert('خرابی', 'براہ کرم اپنا نام درج کریں');
     if (!/^\S+@\S+\.\S+$/.test(email.trim())) return showAlert('خرابی', 'درست ای میل درج کریں');
     if (password.length < 8) return showAlert('خرابی', 'پاس ورڈ کم از کم 8 حروف کا ہونا چاہیے');
+    if (password !== confirmPassword) return showAlert('خرابی', 'پاس ورڈ مماثل نہیں ہیں');
 
     setLoading(true);
     try {
@@ -97,14 +101,34 @@ export default function SignupScreen({ navigation }: any) {
           {!!fieldErrors.email && <Text style={styles.errorText}>{fieldErrors.email}</Text>}
 
           <Text style={styles.label}>پاس ورڈ</Text>
-          <TextInput
-            style={styles.input}
-            placeholder="کم از کم 8 حروف"
-            placeholderTextColor={COLORS.muted}
-            secureTextEntry
-            value={password}
-            onChangeText={setPassword}
-          />
+          <View style={styles.passwordRow}>
+            <TextInput
+              style={[styles.input, styles.passwordInput]}
+              placeholder="کم از کم 8 حروف"
+              placeholderTextColor={COLORS.muted}
+              secureTextEntry={!showPassword}
+              value={password}
+              onChangeText={setPassword}
+            />
+            <TouchableOpacity style={styles.eyeButton} onPress={() => setShowPassword(v => !v)}>
+              <Icon name={showPassword ? 'eye-off' : 'eye'} size={22} color={COLORS.muted} />
+            </TouchableOpacity>
+          </View>
+
+          <Text style={styles.label}>پاس ورڈ کی تصدیق کریں</Text>
+          <View style={styles.passwordRow}>
+            <TextInput
+              style={[styles.input, styles.passwordInput]}
+              placeholder="پاس ورڈ دوبارہ درج کریں"
+              placeholderTextColor={COLORS.muted}
+              secureTextEntry={!showConfirmPassword}
+              value={confirmPassword}
+              onChangeText={setConfirmPassword}
+            />
+            <TouchableOpacity style={styles.eyeButton} onPress={() => setShowConfirmPassword(v => !v)}>
+              <Icon name={showConfirmPassword ? 'eye-off' : 'eye'} size={22} color={COLORS.muted} />
+            </TouchableOpacity>
+          </View>
 
           <Text style={styles.label}>آپ کون ہیں؟</Text>
           <View style={styles.roleRow}>
@@ -176,6 +200,9 @@ const styles = StyleSheet.create({
   label: { fontSize: 15, fontWeight: '600', color: COLORS.text, marginBottom: 8, marginTop: 16 },
   input: { borderWidth: 1.5, borderColor: COLORS.border, borderRadius: 12, padding: 14, fontSize: 16, color: COLORS.text },
   inputError: { borderColor: COLORS.danger },
+  passwordRow: { flexDirection: 'row', alignItems: 'center' },
+  passwordInput: { flex: 1, paddingRight: 46 },
+  eyeButton: { position: 'absolute', right: 14, padding: 4 },
   errorText: { fontSize: 13, color: COLORS.danger, marginTop: 6 },
   roleRow: { flexDirection: 'row', gap: 12 },
   roleCard: { flex: 1, borderWidth: 2, borderColor: COLORS.border, borderRadius: 14, padding: 14, alignItems: 'center' },

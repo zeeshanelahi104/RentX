@@ -10,7 +10,7 @@ import ProfileScreen from '../screens/shared/ProfileScreen';
 
 const Tab = createBottomTabNavigator();
 
-export default function RiderTabs() {
+export default function CustomerTabs() {
   return (
     <Tab.Navigator
       screenOptions={({ route }) => ({

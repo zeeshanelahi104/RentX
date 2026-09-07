@@ -1,9 +1,12 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, FlatList, StyleSheet, TouchableOpacity, Image, ActivityIndicator } from 'react-native';
+import { View, Text, FlatList, StyleSheet, TouchableOpacity, ActivityIndicator, Dimensions } from 'react-native';
 import { MaterialCommunityIcons as Icon } from '@expo/vector-icons';
 import { COLORS } from '../../constants/colors';
 import { VEHICLE_TYPES } from '../../constants/index';
 import { getVehicles } from '../../services/vehicleService';
+import AspectImage from '../../components/AspectImage';
+
+const CARD_WIDTH = Dimensions.get('window').width - 32; // matches FlatList's 16px horizontal padding
 
 export default function VehicleListScreen({ route, navigation }: any) {
   const { tripType, city } = route.params || {};
@@ -37,7 +40,7 @@ export default function VehicleListScreen({ route, navigation }: any) {
 
     return (
       <TouchableOpacity style={styles.card} onPress={() => navigation.navigate('VehicleDetail', { vehicle: item, tripType })}>
-        <Image source={{ uri: item.photos?.[0] || 'https://via.placeholder.com/400x200' }} style={styles.image} />
+        <AspectImage uri={item.photos?.[0] || 'https://via.placeholder.com/400x200'} width={CARD_WIDTH} />
         <View style={styles.cardBody}>
           <View style={styles.cardTop}>
             <Text style={styles.vehicleName}>{item.year} {item.make} {item.model}</Text>
@@ -126,7 +129,6 @@ const styles = StyleSheet.create({
   filterText: { fontSize: 13, color: COLORS.text, fontWeight: '500' },
   filterTextActive: { color: '#fff' },
   card: { backgroundColor: '#fff', borderRadius: 16, marginBottom: 16, elevation: 3, overflow: 'hidden' },
-  image: { width: '100%', height: 190 },
   cardBody: { padding: 14 },
   cardTop: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
   vehicleName: { fontSize: 17, fontWeight: '700', color: COLORS.text, flex: 1 },

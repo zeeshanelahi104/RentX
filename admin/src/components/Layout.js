@@ -6,7 +6,8 @@ const NAV = [
   { to: '/dashboard', icon: '📊', label: 'Dashboard', permission: null },
   { to: '/bookings', icon: '📅', label: 'Bookings', permission: 'manage_bookings' },
   { to: '/drivers', icon: '🚗', label: 'Drivers', permission: 'manage_drivers' },
-  { to: '/users', icon: '👥', label: 'Riders', permission: 'manage_users' },
+  { to: '/subscriptions', icon: '💳', label: 'Subscriptions', permission: 'manage_drivers' },
+  { to: '/users', icon: '👥', label: 'Customers', permission: 'manage_users' },
   { to: '/revenue', icon: '💰', label: 'Revenue', permission: 'view_revenue' },
   { to: '/admins', icon: '🔐', label: 'Admin Users', permission: 'manage_admins' },
 ];

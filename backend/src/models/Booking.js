@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 
 const bookingSchema = new mongoose.Schema(
   {
-    riderId: {
+    customerId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'User',
       required: true,
@@ -76,7 +76,7 @@ const bookingSchema = new mongoose.Schema(
       default: 'pending',
     },
     notes: String,
-    riderRating: {
+    customerRating: {
       score: { type: Number, min: 1, max: 5 },
       comment: String,
     },
@@ -86,7 +86,7 @@ const bookingSchema = new mongoose.Schema(
     },
     cancelledBy: {
       type: String,
-      enum: ['rider', 'driver', 'admin'],
+      enum: ['customer', 'driver', 'admin'],
     },
     cancellationReason: String,
     acceptedAt: Date,
@@ -98,10 +98,12 @@ const bookingSchema = new mongoose.Schema(
 
 // Calculate commission and driver earning before saving
 bookingSchema.pre('save', function (next) {
-  if (this.isModified('totalAmount')) {
-    this.commission = Math.round(this.totalAmount * 0.15);
-    this.driverEarning = this.totalAmount - this.commission;
-  }
+  // [DISABLED: COMMISSION_MODEL] — uncomment to re-enable auto-recompute on totalAmount change
+  // if (this.isModified('totalAmount')) {
+  //   this.commission = Math.round(this.totalAmount * 0.08);
+  //   this.driverEarning = this.totalAmount - this.commission;
+  // }
+  // [END DISABLED: COMMISSION_MODEL]
   next();
 });
 

@@ -13,6 +13,7 @@ import { useGoogleAuthRequest, isGoogleAuthConfigured } from '../../utils/google
 export default function LoginScreen({ navigation }: any) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const { setUser, setToken } = useAuthStore();
 
@@ -73,14 +74,19 @@ export default function LoginScreen({ navigation }: any) {
           />
 
           <Text style={styles.label}>پاس ورڈ</Text>
-          <TextInput
-            style={styles.input}
-            placeholder="پاس ورڈ درج کریں"
-            placeholderTextColor={COLORS.muted}
-            secureTextEntry
-            value={password}
-            onChangeText={setPassword}
-          />
+          <View style={styles.passwordRow}>
+            <TextInput
+              style={[styles.input, styles.passwordInput]}
+              placeholder="پاس ورڈ درج کریں"
+              placeholderTextColor={COLORS.muted}
+              secureTextEntry={!showPassword}
+              value={password}
+              onChangeText={setPassword}
+            />
+            <TouchableOpacity style={styles.eyeButton} onPress={() => setShowPassword(v => !v)}>
+              <Icon name={showPassword ? 'eye-off' : 'eye'} size={22} color={COLORS.muted} />
+            </TouchableOpacity>
+          </View>
 
           <TouchableOpacity
             style={[styles.button, loading && styles.buttonDisabled]}
@@ -123,6 +129,9 @@ const styles = StyleSheet.create({
   subtitle: { fontSize: 15, color: COLORS.textSecondary, textAlign: 'center', marginTop: 6, marginBottom: 16 },
   label: { fontSize: 15, fontWeight: '600', color: COLORS.text, marginBottom: 8, marginTop: 16 },
   input: { borderWidth: 1.5, borderColor: COLORS.border, borderRadius: 12, padding: 14, fontSize: 16, color: COLORS.text },
+  passwordRow: { flexDirection: 'row', alignItems: 'center' },
+  passwordInput: { flex: 1, paddingRight: 46 },
+  eyeButton: { position: 'absolute', right: 14, padding: 4 },
   button: { backgroundColor: COLORS.primary, borderRadius: 12, paddingVertical: 16, alignItems: 'center', marginTop: 28 },
   buttonDisabled: { opacity: 0.6 },
   buttonText: { color: '#fff', fontSize: 18, fontWeight: '700' },

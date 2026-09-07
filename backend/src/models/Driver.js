@@ -61,10 +61,42 @@ const driverSchema = new mongoose.Schema(
       default: 'pending',
     },
     rejectionReason: String,
+    subscriptionStatus: {
+      type: String,
+      enum: ['active', 'expired', 'none'],
+      default: 'none',
+    },
+    subscriptionExpiresAt: {
+      type: Date,
+      default: null,
+    },
+    firstMonthFreeUsed: {
+      type: Boolean,
+      default: false,
+    },
+    referralCode: {
+      type: String,
+      unique: true,
+      sparse: true,
+    },
+    referredBy: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Driver',
+      default: null,
+    },
+    referralRewardIssued: {
+      type: Boolean,
+      default: false,
+    },
+    pendingReferralDiscount: {
+      type: Boolean,
+      default: false,
+    },
   },
   { timestamps: true }
 );
 
 driverSchema.index({ currentLocation: '2dsphere' });
+driverSchema.index({ subscriptionStatus: 1, subscriptionExpiresAt: 1 });
 
 module.exports = mongoose.model('Driver', driverSchema);

@@ -50,6 +50,10 @@ npm run dev
 # Test: open http://localhost:5000/health
 ```
 
+### Production Backend
+Deployed at **https://rentx-bvm4.onrender.com** (Render). Health check:
+https://rentx-bvm4.onrender.com/health
+
 ### Create Admin User (run once in MongoDB)
 ```js
 // In MongoDB Compass or Atlas, run in rentx database:
@@ -139,7 +143,7 @@ npm start
 
 ### MVP (Cash — no integration needed)
 - Customers pay driver directly in cash
-- Driver pays 15% commission to you monthly
+- Driver pays 8% commission to you monthly
 
 ### Online Payments (when ready)
 Sign up at these Pakistani services:
@@ -167,23 +171,24 @@ JAZZCASH_INTEGRITY_SALT=your_salt
 
 ### Model A — MVP (Recommended to start)
 1. Customers pay driver in cash/EasyPaisa
-2. Every week/month, drivers transfer 15% to your JazzCash/bank account
+2. Every week/month, drivers transfer 8% to your JazzCash/bank account
 3. Track manually in admin portal
 
 ### Model B — Automated (after launch)
 1. Integrate PayPro.pk
 2. Customer pays app via PayPro checkout
-3. App holds money, pays driver 85% via EasyPaisa API after trip completion
-4. You automatically keep 15%
+3. App holds money, pays driver 92% via EasyPaisa API after trip completion
+4. You automatically keep 8%
 
 ---
 
 ## 6. PUSH TO PRODUCTION
 
 ### Backend
-- Deploy on: **Railway.app** (free), **Render.com** (free), or **DigitalOcean** ($6/month)
-- Use MongoDB Atlas (free 512MB tier)
-- Set NODE_ENV=production in env
+- Deployed on **Render.com** (free tier): https://rentx-bvm4.onrender.com
+- Uses MongoDB Atlas (free 512MB tier)
+- NODE_ENV=production set in Render env vars
+- Free tier spins down after inactivity — first request after idle can take ~50s
 
 ### Admin
 - Deploy on: **Vercel** (free) or **Netlify** (free)

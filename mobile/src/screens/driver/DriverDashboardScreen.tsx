@@ -63,7 +63,7 @@ export default function DriverDashboardScreen({ navigation }: any) {
     <View style={styles.bookingCard}>
       <View style={styles.bookingTop}>
         <View>
-          <Text style={styles.customerName}>{item.riderId?.name}</Text>
+          <Text style={styles.customerName}>{item.customerId?.name}</Text>
           <Text style={styles.tripType}>{item.tripType?.replace('_', ' ')} • {item.totalDays} دن</Text>
         </View>
         <View style={[styles.statusDot, { backgroundColor: STATUS_COLOR[item.status] }]} />
@@ -117,6 +117,23 @@ export default function DriverDashboardScreen({ navigation }: any) {
         </View>
       )}
 
+      {driver && driver.subscriptionStatus === 'expired' && (
+        <TouchableOpacity style={styles.subExpiredBanner} onPress={() => navigation.navigate('Subscription')}>
+          <Icon name="alert-circle-outline" size={18} color="#fff" />
+          <Text style={styles.subExpiredText}>سبسکرپشن ختم ہو گئی — گاڑی نظر نہیں آ رہی۔ ابھی تجدید کریں</Text>
+        </TouchableOpacity>
+      )}
+
+      {driver && driver.subscriptionStatus === 'active' && driver.subscriptionExpiresAt &&
+        (new Date(driver.subscriptionExpiresAt).getTime() - Date.now()) / 86400000 <= 3 && (
+        <TouchableOpacity style={styles.subWarnBanner} onPress={() => navigation.navigate('Subscription')}>
+          <Icon name="clock-alert-outline" size={18} color="#795548" />
+          <Text style={styles.verifyText}>
+            سبسکرپشن {Math.max(0, Math.ceil((new Date(driver.subscriptionExpiresAt).getTime() - Date.now()) / 86400000))} دن میں ختم ہو جائے گی
+          </Text>
+        </TouchableOpacity>
+      )}
+
       {/* Tabs */}
       <View style={styles.tabRow}>
         {['pending', 'accepted', 'active', 'completed'].map(t => (
@@ -159,6 +176,9 @@ const styles = StyleSheet.create({
   onlineLabel: { color: '#fff', fontSize: 14, fontWeight: '600' },
   verifyBanner: { flexDirection: 'row', alignItems: 'center', backgroundColor: '#FFF8E1', padding: 12, gap: 8 },
   verifyText: { fontSize: 14, color: '#795548', fontWeight: '500' },
+  subExpiredBanner: { flexDirection: 'row', alignItems: 'center', backgroundColor: COLORS.danger, padding: 12, gap: 8 },
+  subExpiredText: { fontSize: 14, color: '#fff', fontWeight: '600', flex: 1 },
+  subWarnBanner: { flexDirection: 'row', alignItems: 'center', backgroundColor: '#FFF8E1', padding: 12, gap: 8 },
   tabRow: { flexDirection: 'row', backgroundColor: '#fff', paddingHorizontal: 12, paddingVertical: 10, gap: 6 },
   tab: { flex: 1, alignItems: 'center', paddingVertical: 6, borderRadius: 8 },
   tabActive: { backgroundColor: COLORS.primary },

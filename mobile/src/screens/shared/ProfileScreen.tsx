@@ -1,12 +1,20 @@
-import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Image } from 'react-native';
 import { MaterialCommunityIcons as Icon } from '@expo/vector-icons';
 import { COLORS } from '../../constants/colors';
 import { showAlert } from '../../utils/alert';
 import { useAuthStore } from '../../store/authStore';
+import { getMyVehicles } from '../../services/vehicleService';
 
 export default function ProfileScreen({ navigation }: any) {
   const { user, logout } = useAuthStore();
+  const [hasVehicle, setHasVehicle] = useState(false);
+
+  useEffect(() => {
+    if (user?.role === 'driver') {
+      getMyVehicles().then(res => setHasVehicle((res.data.vehicles?.length || 0) > 0)).catch(() => {});
+    }
+  }, [user?.role]);
 
   const handleLogout = () => {
     showAlert('لاگ آؤٹ', 'کیا آپ واقعی لاگ آؤٹ کرنا چاہتے ہیں؟', [
@@ -27,9 +35,13 @@ export default function ProfileScreen({ navigation }: any) {
     <ScrollView style={styles.container}>
       {/* Profile Header */}
       <View style={styles.profileHeader}>
-        <View style={styles.avatarCircle}>
-          <Icon name="account" size={52} color="#fff" />
-        </View>
+        {user?.profilePhoto ? (
+          <Image source={{ uri: user.profilePhoto }} style={styles.avatarCircle} />
+        ) : (
+          <View style={styles.avatarCircle}>
+            <Icon name="account" size={52} color="#fff" />
+          </View>
+        )}
         <Text style={styles.name}>{user?.name}</Text>
         <Text style={styles.phone}>{user?.phone || user?.email}</Text>
         <View style={styles.badgeRow}>
@@ -39,7 +51,7 @@ export default function ProfileScreen({ navigation }: any) {
           </View>
           <View style={styles.badge}>
             <Icon name={user?.role === 'driver' ? 'car' : 'account'} size={14} color={COLORS.secondary} />
-            <Text style={styles.badgeText}>{user?.role === 'driver' ? 'ڈرائیور' : 'رائیڈر'}</Text>
+            <Text style={styles.badgeText}>{user?.role === 'driver' ? 'ڈرائیور' : 'کسٹمر'}</Text>
           </View>
           <View style={styles.badge}>
             <Icon name="star" size={14} color="#FFD700" />
@@ -50,10 +62,16 @@ export default function ProfileScreen({ navigation }: any) {
 
       {/* Menu Items */}
       <View style={styles.section}>
+        <MenuItem icon="account-edit" label="پروفائل میں تبدیلی" onPress={() => navigation.navigate('EditProfile')} />
         {user?.role === 'driver' && (
           <>
-            <MenuItem icon="car-plus" label="گاڑی شامل کریں" onPress={() => navigation.navigate('AddVehicle')} />
-            <MenuItem icon="file-document" label="ڈرائیور پروفائل" onPress={() => navigation.navigate('DriverOnboarding')} />
+            {hasVehicle ? (
+              <MenuItem icon="car" label="میری گاڑی" onPress={() => navigation.navigate('DriverTabs', { screen: 'Vehicles' })} />
+            ) : (
+              <MenuItem icon="car-plus" label="گاڑی شامل کریں" onPress={() => navigation.navigate('AddVehicle')} />
+            )}
+            <MenuItem icon="file-document" label="ڈرائیور پروفائل" onPress={() => navigation.navigate('DriverOnboarding', { editMode: true })} />
+            <MenuItem icon="credit-card-outline" label="سبسکرپشن" onPress={() => navigation.navigate('Subscription')} />
           </>
         )}
         <MenuItem

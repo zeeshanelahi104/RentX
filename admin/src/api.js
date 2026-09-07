@@ -43,11 +43,20 @@ export const getAllDrivers = (params) => api.get('/admin/drivers', { params });
 export const verifyDriver = (id) => api.patch(`/admin/drivers/${id}/verify`);
 export const rejectDriver = (id, reason) => api.patch(`/admin/drivers/${id}/reject`, { reason });
 
-// Users / riders
+// Users / customers
 export const getAllUsers = (params) => api.get('/admin/users', { params });
 
 // Revenue
 export const getRevenue = (period) => api.get('/admin/revenue', { params: { period } });
+
+// Driver subscriptions
+export const getAllSubscriptions = (params) => api.get('/admin/subscriptions', { params });
+export const markSubscriptionPaid = (driverId, data) => api.patch(`/admin/subscriptions/${driverId}/mark-paid`, data);
+export const extendSubscription = (driverId, data) => api.patch(`/admin/subscriptions/${driverId}/extend`, data);
+export const getSubscriptionConfig = () => api.get('/admin/subscriptions/config');
+export const updateSubscriptionConfig = (data) => api.patch('/admin/subscriptions/config', data);
+export const getSubscriptionStats = () => api.get('/admin/subscriptions/stats');
+export const grantFreeMonthBulk = () => api.post('/admin/subscriptions/grant-free-month-bulk');
 
 // Admin user management (superadmin only)
 export const listAdmins = () => api.get('/admin/admins');

@@ -19,7 +19,7 @@ export default function HomeScreen({ navigation }: any) {
       <View style={styles.header}>
         <View>
           <Text style={styles.greeting}>السلام علیکم 👋</Text>
-          <Text style={styles.userName}>{user?.name || 'رائیڈر'}</Text>
+          <Text style={styles.userName}>{user?.name || 'کسٹمر'}</Text>
         </View>
         <View style={styles.cityBtn}>
           <Icon name="map-marker" size={16} color="#fff" />

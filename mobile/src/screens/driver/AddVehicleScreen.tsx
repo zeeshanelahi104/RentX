@@ -7,6 +7,7 @@ import { showAlert } from '../../utils/alert';
 import { VEHICLE_TYPES, CITIES } from '../../constants/index';
 import { addVehicle, uploadVehiclePhotos } from '../../services/vehicleService';
 import { useAuthStore } from '../../store/authStore';
+import { appendImageToFormData } from '../../utils/formDataImage';
 
 const FEATURES = ['AC', 'WiFi', 'GPS', 'Child Seat', 'Music System', 'Charging Port'];
 
@@ -56,7 +57,9 @@ export default function AddVehicleScreen({ navigation }: any) {
 
       if (photos.length > 0) {
         const formData = new FormData();
-        photos.forEach((p, i) => formData.append('photos', { uri: p.uri, type: p.mimeType || 'image/jpeg', name: `vehicle_${i}.jpg` } as any));
+        for (let i = 0; i < photos.length; i++) {
+          await appendImageToFormData(formData, 'photos', photos[i], `vehicle_${i}.jpg`);
+        }
         await uploadVehiclePhotos(res.data.vehicle._id, formData);
       }
 

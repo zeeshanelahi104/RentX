@@ -13,13 +13,13 @@ const sendMessage = async (req, res, next) => {
     const booking = await Booking.findById(bookingId).populate('driverId');
     if (!booking) return res.status(404).json({ success: false, message: 'Booking not found' });
 
-    const isRider = booking.riderId.toString() === req.user._id.toString();
+    const isCustomer = booking.customerId.toString() === req.user._id.toString();
     const driverUserId = booking.driverId.userId.toString();
     const isDriver = driverUserId === req.user._id.toString();
 
-    if (!isRider && !isDriver) return res.status(403).json({ success: false, message: 'Access denied' });
+    if (!isCustomer && !isDriver) return res.status(403).json({ success: false, message: 'Access denied' });
 
-    const receiverId = isRider ? booking.driverId.userId : booking.riderId;
+    const receiverId = isCustomer ? booking.driverId.userId : booking.customerId;
 
     const message = await Message.create({
       bookingId,
@@ -53,7 +53,7 @@ const getMessages = async (req, res, next) => {
 
     const driverUserId = booking.driverId.userId.toString();
     const isParticipant =
-      booking.riderId.toString() === req.user._id.toString() ||
+      booking.customerId.toString() === req.user._id.toString() ||
       driverUserId === req.user._id.toString();
 
     if (!isParticipant) return res.status(403).json({ success: false, message: 'Access denied' });

@@ -7,17 +7,17 @@ ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend)
 
 const MOCK_REVENUE = {
   totalRevenue: 213000,
-  totalCommission: 31950,
+  totalCommission: 17040,
   thisMonth: 87000,
-  thisMonthCommission: 13050,
+  thisMonthCommission: 6960,
   avgBookingValue: 7500,
   monthlyBreakdown: [
-    { month: 'Jan 2026', revenue: 12000, commission: 1800, bookings: 8 },
-    { month: 'Feb 2026', revenue: 18000, commission: 2700, bookings: 12 },
-    { month: 'Mar 2026', revenue: 22000, commission: 3300, bookings: 15 },
-    { month: 'Apr 2026', revenue: 31000, commission: 4650, bookings: 21 },
-    { month: 'May 2026', revenue: 45000, commission: 6750, bookings: 30 },
-    { month: 'Jun 2026', revenue: 87000, commission: 13050, bookings: 56 },
+    { month: 'Jan 2026', revenue: 12000, commission: 960, bookings: 8 },
+    { month: 'Feb 2026', revenue: 18000, commission: 1440, bookings: 12 },
+    { month: 'Mar 2026', revenue: 22000, commission: 1760, bookings: 15 },
+    { month: 'Apr 2026', revenue: 31000, commission: 2480, bookings: 21 },
+    { month: 'May 2026', revenue: 45000, commission: 3600, bookings: 30 },
+    { month: 'Jun 2026', revenue: 87000, commission: 6960, bookings: 56 },
   ],
   byTripType: { city_day: 45000, intercity: 72000, wedding: 84000, airport: 12000 },
   byPaymentMethod: { cash: 156000, easypaisa: 34000, jazzcash: 23000 },
@@ -42,7 +42,10 @@ export default function RevenuePage() {
 
   return (
     <div>
-      <h2 style={{ marginBottom: 24, fontSize: 22, fontWeight: 700 }}>Revenue & Earnings</h2>
+      <h2 style={{ marginBottom: 4, fontSize: 22, fontWeight: 700 }}>Booking Revenue (Legacy — pre-Nov 2026 commission model)</h2>
+      <p style={{ marginBottom: 24, color: '#6B7280', fontSize: 14 }}>
+        Commission is disabled for new bookings since the switch to driver subscriptions. See the Subscriptions page for current revenue.
+      </p>
 
       <div className="stat-grid">
         <div className="stat-card green">
@@ -50,16 +53,16 @@ export default function RevenuePage() {
           <div className="value">PKR {data.totalRevenue?.toLocaleString()}</div>
         </div>
         <div className="stat-card orange">
-          <div className="label">Your Commission (All Time)</div>
+          <div className="label">Legacy Commission (All Time)</div>
           <div className="value">PKR {data.totalCommission?.toLocaleString()}</div>
-          <div className="sub">15% of total revenue</div>
+          <div className="sub">Commission model disabled — historical only</div>
         </div>
         <div className="stat-card green">
           <div className="label">This Month Revenue</div>
           <div className="value">PKR {data.thisMonth?.toLocaleString()}</div>
         </div>
         <div className="stat-card orange">
-          <div className="label">This Month Commission</div>
+          <div className="label">This Month Legacy Commission</div>
           <div className="value">PKR {data.thisMonthCommission?.toLocaleString()}</div>
         </div>
         <div className="stat-card blue">
@@ -86,7 +89,7 @@ export default function RevenuePage() {
                 <tr key={type}>
                   <td>{type.replace('_', ' ')}</td>
                   <td style={{ fontWeight: 700 }}>PKR {rev.toLocaleString()}</td>
-                  <td style={{ color: '#1B5E20', fontWeight: 700 }}>PKR {(rev * 0.15).toLocaleString()}</td>
+                  <td style={{ color: '#1B5E20', fontWeight: 700 }}>PKR {(rev * 0.08).toLocaleString()}</td>
                 </tr>
               ))}
             </tbody>

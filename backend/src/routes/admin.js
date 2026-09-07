@@ -29,7 +29,7 @@ router.get('/stats', async (req, res, next) => {
 
     const [
       totalBookings, totalRevenue, commission, activeDrivers,
-      pendingVerification, totalRiders, todayBookings, thisMonthRevenue,
+      pendingVerification, totalCustomers, todayBookings, thisMonthRevenue,
       bookingsByStatus,
     ] = await Promise.all([
       Booking.countDocuments(),
@@ -37,7 +37,7 @@ router.get('/stats', async (req, res, next) => {
       Booking.aggregate([{ $match: { status: 'completed' } }, { $group: { _id: null, total: { $sum: '$commission' } } }]),
       Driver.countDocuments({ isVerified: true }),
       Driver.countDocuments({ verificationStatus: { $in: ['pending', 'under_review'] } }),
-      User.countDocuments({ role: 'rider' }),
+      User.countDocuments({ role: 'customer' }),
       Booking.countDocuments({ createdAt: { $gte: today } }),
       Booking.aggregate([{ $match: { status: 'completed', createdAt: { $gte: monthStart } } }, { $group: { _id: null, total: { $sum: '$totalAmount' } } }]),
       Booking.aggregate([{ $group: { _id: '$status', count: { $sum: 1 } } }]),
@@ -70,7 +70,7 @@ router.get('/stats', async (req, res, next) => {
       stats: {
         totalBookings, totalRevenue: totalRevenue[0]?.total || 0,
         commission: commission[0]?.total || 0,
-        activeDrivers, pendingVerification, totalRiders,
+        activeDrivers, pendingVerification, totalCustomers,
         todayBookings, thisMonthRevenue: thisMonthRevenue[0]?.total || 0,
         bookingsByStatus: statusMap, revenueChart, topCities,
       },
@@ -86,7 +86,7 @@ router.get('/bookings', requirePermission('manage_bookings'), async (req, res, n
     if (status) filter.status = status;
 
     const bookings = await Booking.find(filter)
-      .populate('riderId', 'name phone')
+      .populate('customerId', 'name phone')
       .populate({ path: 'driverId', populate: { path: 'userId', select: 'name phone' } })
       .populate('vehicleId', 'make model year')
       .sort({ createdAt: -1 })
@@ -100,9 +100,10 @@ router.get('/bookings', requirePermission('manage_bookings'), async (req, res, n
 // ── Drivers (manage_drivers) ─────────────────────────────────────────────────
 router.get('/drivers', requirePermission('manage_drivers'), async (req, res, next) => {
   try {
-    const { status } = req.query;
+    const { status, subStatus } = req.query;
     const filter = {};
     if (status) filter.verificationStatus = status;
+    if (subStatus) filter.subscriptionStatus = subStatus;
 
     const drivers = await Driver.find(filter)
       .populate('userId', 'name phone rating')
@@ -136,12 +137,12 @@ router.patch('/drivers/:id/reject', requirePermission('manage_drivers'), async (
   } catch (err) { next(err); }
 });
 
-// ── Users / riders (manage_users) ────────────────────────────────────────────
+// ── Users / customers (manage_users) ─────────────────────────────────────────
 router.get('/users', requirePermission('manage_users'), async (req, res, next) => {
   try {
     const { role } = req.query;
-    const filter = { role: { $in: ['rider', 'driver'] } };
-    if (role && ['rider', 'driver'].includes(role)) filter.role = role;
+    const filter = { role: { $in: ['customer', 'driver'] } };
+    if (role && ['customer', 'driver'].includes(role)) filter.role = role;
 
     const users = await User.find(filter).sort({ createdAt: -1 }).limit(200);
     res.json({ success: true, users });
@@ -184,6 +185,141 @@ router.get('/revenue', requirePermission('view_revenue'), async (req, res, next)
         revenue: m.revenue, commission: m.commission, bookings: m.bookings,
       })),
     });
+  } catch (err) { next(err); }
+});
+
+// ── Driver subscriptions (manage_drivers / view_revenue) ─────────────────────
+const AppConfig = require('../models/AppConfig');
+const DriverSubscription = require('../models/DriverSubscription');
+const subscriptionService = require('../services/subscriptionService');
+
+router.get('/subscriptions', requirePermission('manage_drivers'), async (req, res, next) => {
+  try {
+    const { status } = req.query;
+
+    // Same lazy sweep as getVehicles, so this list is never stale.
+    await Driver.updateMany(
+      { subscriptionStatus: 'active', subscriptionExpiresAt: { $lt: new Date() } },
+      { subscriptionStatus: 'expired' }
+    );
+
+    const filter = {};
+    if (status) filter.subscriptionStatus = status;
+
+    const drivers = await Driver.find(filter)
+      .populate('userId', 'name phone')
+      .sort({ subscriptionExpiresAt: 1 });
+
+    res.json({ success: true, drivers });
+  } catch (err) { next(err); }
+});
+
+router.patch('/subscriptions/:driverId/mark-paid', requirePermission('manage_drivers'), async (req, res, next) => {
+  try {
+    const { months = 1, reference } = req.body;
+    const driver = await Driver.findById(req.params.driverId);
+    if (!driver) return res.status(404).json({ success: false, message: 'Driver not found' });
+
+    const amount = await subscriptionService.getSubscriptionPrice(driver);
+    const updated = await subscriptionService.applySubscriptionPayment(driver._id, {
+      amount,
+      method: 'manual',
+      mode: 'manual',
+      reference,
+      recordedBy: req.user._id,
+      months: Number(months),
+    });
+
+    res.json({ success: true, driver: updated });
+  } catch (err) { next(err); }
+});
+
+router.patch('/subscriptions/:driverId/extend', requirePermission('manage_drivers'), async (req, res, next) => {
+  try {
+    const { days } = req.body;
+    const driver = await Driver.findById(req.params.driverId);
+    if (!driver) return res.status(404).json({ success: false, message: 'Driver not found' });
+
+    const now = new Date();
+    const base = driver.subscriptionExpiresAt && driver.subscriptionExpiresAt > now ? driver.subscriptionExpiresAt : now;
+    const newExpiry = new Date(base);
+    newExpiry.setDate(newExpiry.getDate() + Number(days));
+
+    driver.subscriptionExpiresAt = newExpiry;
+    driver.subscriptionStatus = 'active';
+    await driver.save();
+
+    res.json({ success: true, driver });
+  } catch (err) { next(err); }
+});
+
+router.get('/subscriptions/config', requirePermission('manage_drivers'), async (req, res, next) => {
+  try {
+    const mode = await subscriptionService.getPaymentMode();
+    res.json({ success: true, subscriptionPaymentMode: mode });
+  } catch (err) { next(err); }
+});
+
+router.patch('/subscriptions/config', requirePermission('manage_drivers'), async (req, res, next) => {
+  try {
+    const { subscriptionPaymentMode } = req.body;
+    if (!['manual', 'gateway'].includes(subscriptionPaymentMode)) {
+      return res.status(400).json({ success: false, message: 'Invalid mode' });
+    }
+    const config = await AppConfig.findOneAndUpdate(
+      { key: 'global' },
+      { subscriptionPaymentMode },
+      { upsert: true, new: true }
+    );
+    res.json({ success: true, subscriptionPaymentMode: config.subscriptionPaymentMode });
+  } catch (err) { next(err); }
+});
+
+router.get('/subscriptions/stats', requirePermission('view_revenue'), async (req, res, next) => {
+  try {
+    const today = new Date(); today.setHours(0, 0, 0, 0);
+    const monthStart = new Date(today.getFullYear(), today.getMonth(), 1);
+
+    const [totalActive, totalExpired, totalNone, revenueAgg, thisMonthAgg] = await Promise.all([
+      Driver.countDocuments({ subscriptionStatus: 'active' }),
+      Driver.countDocuments({ subscriptionStatus: 'expired' }),
+      Driver.countDocuments({ subscriptionStatus: 'none' }),
+      DriverSubscription.aggregate([
+        { $unwind: '$payments' },
+        { $match: { 'payments.status': 'paid', 'payments.method': { $ne: 'first_month_free' } } },
+        { $group: { _id: null, total: { $sum: '$payments.amount' } } },
+      ]),
+      DriverSubscription.aggregate([
+        { $unwind: '$payments' },
+        { $match: { 'payments.status': 'paid', 'payments.method': { $ne: 'first_month_free' }, 'payments.createdAt': { $gte: monthStart } } },
+        { $group: { _id: null, total: { $sum: '$payments.amount' } } },
+      ]),
+    ]);
+
+    res.json({
+      success: true,
+      stats: {
+        activeDrivers: totalActive,
+        expiredDrivers: totalExpired,
+        unsubscribedDrivers: totalNone,
+        totalRevenue: revenueAgg[0]?.total || 0,
+        thisMonthRevenue: thisMonthAgg[0]?.total || 0,
+      },
+    });
+  } catch (err) { next(err); }
+});
+
+router.post('/subscriptions/grant-free-month-bulk', requireSuperAdmin, async (req, res, next) => {
+  try {
+    const freeUntil = new Date(subscriptionService.LAUNCH_DATE);
+    freeUntil.setMonth(freeUntil.getMonth() + 1);
+
+    const result = await Driver.updateMany(
+      { firstMonthFreeUsed: { $ne: true } },
+      { subscriptionStatus: 'active', subscriptionExpiresAt: freeUntil, firstMonthFreeUsed: true }
+    );
+
+    res.json({ success: true, modifiedCount: result.modifiedCount });
   } catch (err) { next(err); }
 });
 

@@ -2,7 +2,7 @@
 
 **Last updated: [DATE]**
 
-RentX ("we", "our", "the App") is a vehicle rental platform connecting riders and drivers. This policy explains what information we collect, why, and how it is used.
+RentX ("we", "our", "the App") is a vehicle rental platform connecting customers and drivers. This policy explains what information we collect, why, and how it is used.
 
 ## 1. Information We Collect
 
@@ -15,14 +15,14 @@ RentX ("we", "our", "the App") is a vehicle rental platform connecting riders an
 - For drivers: CNIC (national ID) number, CNIC front/back photos, driving license number and photo — collected to verify driver identity before approving them to operate on the platform
 
 **Location**
-- Precise device location (GPS), used to show nearby vehicles to riders, track a driver's live location during an active trip, and calculate routes
+- Precise device location (GPS), used to show nearby vehicles to customers, track a driver's live location during an active trip, and calculate routes
 
 **Vehicle and booking information**
 - For drivers: vehicle details (make, model, year, plate number, photos, rental rates)
-- For riders: booking details (pickup/drop-off, trip dates, trip type, chosen payment method)
+- For customers: booking details (pickup/drop-off, trip dates, trip type, chosen payment method)
 
 **Communications**
-- Messages sent between riders and drivers through the in-app chat, to coordinate pickup and trip details
+- Messages sent between customers and drivers through the in-app chat, to coordinate pickup and trip details
 
 **Device information**
 - A push-notification token (via Firebase Cloud Messaging) used to send you booking updates and chat alerts
@@ -35,7 +35,7 @@ RentX ("we", "our", "the App") is a vehicle rental platform connecting riders an
 We use the information above to:
 - Create and manage your account
 - Verify driver identity before approving them to accept bookings
-- Match riders with available, nearby vehicles
+- Match customers with available, nearby vehicles
 - Process and manage bookings and trip communication
 - Send push notifications about booking status, messages, and account activity
 - Calculate driver earnings and platform commission
@@ -50,7 +50,7 @@ RentX supports cash payments and mobile wallet payments (EasyPaisa, JazzCash). W
 ## 4. Data Sharing
 
 We share information only as needed to operate the service:
-- **Between riders and drivers**: name, rating, profile photo, phone/vehicle details relevant to an active booking are visible to the other party in that booking
+- **Between customers and drivers**: name, rating, profile photo, phone/vehicle details relevant to an active booking are visible to the other party in that booking
 - **Service providers**: Cloudinary (image storage), Firebase (push notifications), Twilio (SMS/OTP verification), and our cloud database/hosting providers, solely to provide the App's functionality
 - **Legal requirements**: if required by law or to protect the rights, safety, or property of RentX, our users, or the public
 

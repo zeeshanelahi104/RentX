@@ -62,6 +62,8 @@ tr:hover td { background: #F9FAF9; }
 .badge.verified { background: #E8F5E9; color: #2E7D32; }
 .badge.pending_review { background: #FFF8E1; color: #F57F17; }
 .badge.rejected { background: #FFEBEE; color: #C62828; }
+.badge.expired { background: #FFEBEE; color: #C62828; }
+.badge.none { background: #F5F6FA; color: #6B7280; }
 
 /* Buttons */
 .btn { padding: 8px 18px; border-radius: 8px; border: none; cursor: pointer; font-size: 14px; font-weight: 600; transition: opacity 0.2s; }

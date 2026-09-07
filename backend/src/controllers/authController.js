@@ -29,7 +29,7 @@ const register = async (req, res, next) => {
       return res.status(400).json({ success: false, message: 'Name, email, password, role, and city are required' });
     }
 
-    if (!['rider', 'driver'].includes(role)) {
+    if (!['customer', 'driver'].includes(role)) {
       return res.status(400).json({ success: false, message: 'Invalid role' });
     }
 
@@ -104,7 +104,7 @@ const googleAuth = async (req, res, next) => {
     let user = await User.findOne({ $or: [{ googleId: payload.sub }, { email: payload.email }] });
 
     if (!user) {
-      if (role && !['rider', 'driver'].includes(role)) {
+      if (role && !['customer', 'driver'].includes(role)) {
         return res.status(400).json({ success: false, message: 'Invalid role' });
       }
       user = await User.create({
@@ -112,7 +112,7 @@ const googleAuth = async (req, res, next) => {
         email: payload.email,
         name: payload.name,
         profilePhoto: payload.picture,
-        role: role || undefined, // falls back to the schema default ('rider') until they pick one
+        role: role || undefined, // falls back to the schema default ('customer') until they pick one
         city: city || undefined,
         isProfileComplete: !!(role && city),
       });
@@ -142,7 +142,7 @@ const completeProfile = async (req, res, next) => {
     if (!role || !city) {
       return res.status(400).json({ success: false, message: 'Role and city are required' });
     }
-    if (!['rider', 'driver'].includes(role)) {
+    if (!['customer', 'driver'].includes(role)) {
       return res.status(400).json({ success: false, message: 'Invalid role' });
     }
 

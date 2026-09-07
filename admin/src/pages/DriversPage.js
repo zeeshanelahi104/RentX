@@ -11,17 +11,23 @@ export default function DriversPage() {
   const [drivers, setDrivers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState('all');
+  const [subFilter, setSubFilter] = useState('all');
   const [search, setSearch] = useState('');
 
   const fetchDrivers = () => {
     setLoading(true);
-    api.get('/admin/drivers', { params: { status: filter !== 'all' ? filter : undefined } })
+    api.get('/admin/drivers', {
+      params: {
+        status: filter !== 'all' ? filter : undefined,
+        subStatus: subFilter !== 'all' ? subFilter : undefined,
+      },
+    })
       .then(r => setDrivers(r.data.drivers))
       .catch(() => setDrivers(MOCK_DRIVERS))
       .finally(() => setLoading(false));
   };
 
-  useEffect(() => { fetchDrivers(); }, [filter]);
+  useEffect(() => { fetchDrivers(); }, [filter, subFilter]);
 
   const handleVerify = async (id) => {
     try {
@@ -37,6 +43,14 @@ export default function DriversPage() {
       await api.patch(`/admin/drivers/${id}/reject`, { reason });
       fetchDrivers();
     } catch { alert('Error rejecting driver'); }
+  };
+
+  const handleMarkPaid = async (id) => {
+    const reference = prompt('Payment reference / note (optional):') || '';
+    try {
+      await api.patch(`/admin/subscriptions/${id}/mark-paid`, { months: 1, reference });
+      fetchDrivers();
+    } catch { alert('Error marking subscription paid'); }
   };
 
   const filtered = drivers.filter(d =>
@@ -58,6 +72,12 @@ export default function DriversPage() {
           <option value="approved">Approved</option>
           <option value="rejected">Rejected</option>
         </select>
+        <select value={subFilter} onChange={e => setSubFilter(e.target.value)}>
+          <option value="all">Any Subscription</option>
+          <option value="active">Subscription Active</option>
+          <option value="expired">Subscription Expired</option>
+          <option value="none">No Subscription</option>
+        </select>
       </div>
 
       <div className="table-card">
@@ -77,6 +97,7 @@ export default function DriversPage() {
                 <th>Trips</th>
                 <th>Rating</th>
                 <th>Status</th>
+                <th>Subscription</th>
                 <th>Joined</th>
                 <th>Actions</th>
               </tr>
@@ -91,14 +112,18 @@ export default function DriversPage() {
                   <td>{driver.totalTrips || 0}</td>
                   <td>⭐ {driver.userId?.rating?.toFixed(1)}</td>
                   <td><span className={`badge ${driver.verificationStatus}`}>{driver.verificationStatus?.replace('_', ' ')}</span></td>
+                  <td><span className={`badge ${driver.subscriptionStatus || 'none'}`}>{driver.subscriptionStatus || 'none'}</span></td>
                   <td style={{ fontSize: 12, color: '#6B7280' }}>{new Date(driver.createdAt).toLocaleDateString()}</td>
                   <td>
-                    <div style={{ display: 'flex', gap: 6 }}>
+                    <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
                       {driver.verificationStatus !== 'approved' && (
                         <button className="btn btn-success btn-sm" onClick={() => handleVerify(driver._id)}>✓ Verify</button>
                       )}
                       {driver.verificationStatus !== 'rejected' && (
                         <button className="btn btn-danger btn-sm" onClick={() => handleReject(driver._id)}>✗ Reject</button>
+                      )}
+                      {driver.subscriptionStatus !== 'active' && (
+                        <button className="btn btn-success btn-sm" onClick={() => handleMarkPaid(driver._id)}>💳 Mark Paid</button>
                       )}
                     </div>
                   </td>

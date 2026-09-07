@@ -1,13 +1,17 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image, FlatList, Dimensions } from 'react-native';
 import { MaterialCommunityIcons as Icon } from '@expo/vector-icons';
 import { COLORS } from '../../constants/colors';
 
 const { width } = Dimensions.get('window');
 
+const MIN_PHOTO_HEIGHT = 220;
+const MAX_PHOTO_HEIGHT = 380;
+
 export default function VehicleDetailScreen({ route, navigation }: any) {
   const { vehicle, tripType } = route.params;
   const [activePhoto, setActivePhoto] = useState(0);
+  const [photoHeight, setPhotoHeight] = useState(260);
   const driver = vehicle.driverId;
   const user = driver?.userId;
 
@@ -20,6 +24,17 @@ export default function VehicleDetailScreen({ route, navigation }: any) {
   const price = priceMap[tripType] || vehicle.rates?.cityPerDay;
   const photos = vehicle.photos?.length ? vehicle.photos : ['https://via.placeholder.com/400x250'];
 
+  useEffect(() => {
+    Image.getSize(
+      photos[0],
+      (w, h) => {
+        const scaled = (width * h) / w;
+        setPhotoHeight(Math.min(Math.max(scaled, MIN_PHOTO_HEIGHT), MAX_PHOTO_HEIGHT));
+      },
+      () => setPhotoHeight(260)
+    );
+  }, [photos[0]]);
+
   return (
     <View style={{ flex: 1, backgroundColor: '#fff' }}>
       <ScrollView>
@@ -31,7 +46,7 @@ export default function VehicleDetailScreen({ route, navigation }: any) {
             pagingEnabled
             showsHorizontalScrollIndicator={false}
             onMomentumScrollEnd={e => setActivePhoto(Math.round(e.nativeEvent.contentOffset.x / width))}
-            renderItem={({ item }) => <Image source={{ uri: item }} style={[styles.photo, { width }]} />}
+            renderItem={({ item }) => <Image source={{ uri: item }} style={[styles.photo, { width, height: photoHeight }]} />}
             keyExtractor={(_, i) => i.toString()}
           />
           <View style={styles.dotRow}>
@@ -128,7 +143,7 @@ export default function VehicleDetailScreen({ route, navigation }: any) {
 }
 
 const styles = StyleSheet.create({
-  photo: { height: 260, resizeMode: 'cover' },
+  photo: { resizeMode: 'contain', backgroundColor: '#F2F2F2' },
   dotRow: { flexDirection: 'row', justifyContent: 'center', gap: 6, position: 'absolute', bottom: 12, width: '100%' },
   dot: { width: 7, height: 7, borderRadius: 4, backgroundColor: 'rgba(255,255,255,0.5)' },
   dotActive: { backgroundColor: '#fff', width: 20 },

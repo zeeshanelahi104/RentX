@@ -26,7 +26,7 @@ export default function BookingScreen({ route, navigation }: any) {
   const priceMap: any = { city_day: vehicle.rates?.cityPerDay, wedding: vehicle.rates?.weddingPerDay, intercity: vehicle.rates?.intercityPerDay, airport: vehicle.rates?.airportFlat };
   const dailyRate = priceMap[tripType] || vehicle.rates?.cityPerDay;
   const totalAmount = tripType === 'airport' ? dailyRate : dailyRate * totalDays;
-  const commission = Math.round(totalAmount * 0.15);
+  const commission = Math.round(totalAmount * 0.08);
   const driverEarning = totalAmount - commission;
 
   const formatDate = (d: Date) => d.toLocaleDateString('ur-PK', { day: '2-digit', month: 'short', year: 'numeric' });
@@ -130,7 +130,7 @@ export default function BookingScreen({ route, navigation }: any) {
         <View style={styles.summary}>
           <Text style={styles.summaryTitle}>قیمت کا خلاصہ</Text>
           <View style={styles.summaryRow}><Text style={styles.summaryLabel}>PKR {dailyRate?.toLocaleString()} × {tripType === 'airport' ? '1 سفر' : `${totalDays} دن`}</Text><Text style={styles.summaryVal}>PKR {totalAmount?.toLocaleString()}</Text></View>
-          <View style={styles.summaryRow}><Text style={styles.summaryLabel}>پلیٹ فارم فیس (15%)</Text><Text style={styles.summaryVal}>PKR {commission?.toLocaleString()}</Text></View>
+          <View style={styles.summaryRow}><Text style={styles.summaryLabel}>پلیٹ فارم فیس (8%)</Text><Text style={styles.summaryVal}>PKR {commission?.toLocaleString()}</Text></View>
           <View style={[styles.summaryRow, styles.totalRow]}><Text style={styles.totalLabel}>کل ادائیگی</Text><Text style={styles.totalVal}>PKR {totalAmount?.toLocaleString()}</Text></View>
         </View>
       </ScrollView>

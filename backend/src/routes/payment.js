@@ -8,10 +8,10 @@ const Booking = require('../models/Booking');
 router.post('/initiate', protect, async (req, res, next) => {
   try {
     const { bookingId, method } = req.body;
-    const booking = await Booking.findById(bookingId).populate('riderId');
+    const booking = await Booking.findById(bookingId).populate('customerId');
     if (!booking) return res.status(404).json({ success: false, message: 'Booking not found' });
 
-    const rider = booking.riderId;
+    const customer = booking.customerId;
     const orderId = `RX-${bookingId.slice(-8).toUpperCase()}`;
 
     let result;
@@ -19,14 +19,14 @@ router.post('/initiate', protect, async (req, res, next) => {
       result = await createPayProInvoice({
         orderId,
         amount: booking.totalAmount,
-        customerName: rider.name,
-        customerPhone: rider.phone,
+        customerName: customer.name,
+        customerPhone: customer.phone,
         description: `RentX Booking #${orderId}`,
       });
     } else if (method === 'easypaisa') {
-      result = await createEasypaisaOTC({ orderId, amount: booking.totalAmount, customerPhone: rider.phone });
+      result = await createEasypaisaOTC({ orderId, amount: booking.totalAmount, customerPhone: customer.phone });
     } else if (method === 'jazzcash') {
-      result = await createJazzCashPayment({ orderId, amount: booking.totalAmount, customerPhone: rider.phone });
+      result = await createJazzCashPayment({ orderId, amount: booking.totalAmount, customerPhone: customer.phone });
     } else {
       return res.status(400).json({ success: false, message: 'Unknown payment method' });
     }
@@ -41,8 +41,28 @@ router.post('/initiate', protect, async (req, res, next) => {
 router.post('/paypro-callback', async (req, res) => {
   const { MerchantOrderId, TransactionStatus, TransactionId } = req.body;
   if (TransactionStatus === 'SUCCESS') {
-    const bookingId = MerchantOrderId.replace('RX-', '');
-    await Booking.findOneAndUpdate({ _id: { $regex: bookingId } }, { paymentStatus: 'paid' });
+    if (MerchantOrderId.startsWith('SUB-')) {
+      // Subscription payment — look up the pending payment record by its
+      // stored orderId reference and apply it via the shared service, same
+      // extend-and-activate logic as the admin manual mark-paid path.
+      const DriverSubscription = require('../models/DriverSubscription');
+      const subscriptionService = require('../services/subscriptionService');
+      const sub = await DriverSubscription.findOne({ 'payments.reference': MerchantOrderId });
+      if (sub) {
+        const payment = sub.payments.find(p => p.reference === MerchantOrderId);
+        if (payment && payment.status === 'pending') {
+          await subscriptionService.applySubscriptionPayment(sub.driverId, {
+            amount: payment.amount,
+            method: payment.method,
+            mode: 'gateway',
+            reference: MerchantOrderId,
+          });
+        }
+      }
+    } else {
+      const bookingId = MerchantOrderId.replace('RX-', '');
+      await Booking.findOneAndUpdate({ _id: { $regex: bookingId } }, { paymentStatus: 'paid' });
+    }
   }
   res.json({ success: true });
 });

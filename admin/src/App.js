@@ -5,6 +5,7 @@ import LoginPage from './pages/LoginPage';
 import DashboardPage from './pages/DashboardPage';
 import BookingsPage from './pages/BookingsPage';
 import DriversPage from './pages/DriversPage';
+import SubscriptionsPage from './pages/SubscriptionsPage';
 import UsersPage from './pages/UsersPage';
 import RevenuePage from './pages/RevenuePage';
 import AdminUsersPage from './pages/AdminUsersPage';
@@ -38,6 +39,7 @@ export default function App() {
           <Route path="dashboard" element={<DashboardPage />} />
           <Route path="bookings" element={<PermissionGuard permission="manage_bookings"><BookingsPage /></PermissionGuard>} />
           <Route path="drivers" element={<PermissionGuard permission="manage_drivers"><DriversPage /></PermissionGuard>} />
+          <Route path="subscriptions" element={<PermissionGuard permission="manage_drivers"><SubscriptionsPage /></PermissionGuard>} />
           <Route path="users" element={<PermissionGuard permission="manage_users"><UsersPage /></PermissionGuard>} />
           <Route path="revenue" element={<PermissionGuard permission="view_revenue"><RevenuePage /></PermissionGuard>} />
           <Route path="admins" element={<PermissionGuard permission="manage_admins"><AdminUsersPage /></PermissionGuard>} />

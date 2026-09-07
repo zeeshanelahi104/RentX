@@ -4,9 +4,9 @@ import api from '../api';
 const STATUS_COLORS = { pending: 'pending', accepted: 'accepted', active: 'active', completed: 'completed', cancelled: 'cancelled' };
 
 const MOCK = [
-  { _id: 'b1', riderId: { name: 'Bilal Shah' }, driverId: { userId: { name: 'Ahmed Ali' } }, vehicleId: { make: 'Toyota', model: 'Corolla' }, tripType: 'wedding', pickupLocation: { address: 'Chiniot' }, totalAmount: 15000, commission: 2250, status: 'completed', startDate: new Date().toISOString(), createdAt: new Date().toISOString() },
-  { _id: 'b2', riderId: { name: 'Sara Khan' }, driverId: { userId: { name: 'Usman' } }, vehicleId: { make: 'Honda', model: 'Civic' }, tripType: 'intercity', pickupLocation: { address: 'Faisalabad' }, totalAmount: 7000, commission: 1050, status: 'active', startDate: new Date().toISOString(), createdAt: new Date().toISOString() },
-  { _id: 'b3', riderId: { name: 'Hamza Butt' }, driverId: { userId: { name: 'Tariq' } }, vehicleId: { make: 'Toyota', model: 'Prado' }, tripType: 'city_day', pickupLocation: { address: 'Jhang' }, totalAmount: 10000, commission: 1500, status: 'pending', startDate: new Date().toISOString(), createdAt: new Date().toISOString() },
+  { _id: 'b1', customerId: { name: 'Bilal Shah' }, driverId: { userId: { name: 'Ahmed Ali' } }, vehicleId: { make: 'Toyota', model: 'Corolla' }, tripType: 'wedding', pickupLocation: { address: 'Chiniot' }, totalAmount: 15000, commission: 1200, status: 'completed', startDate: new Date().toISOString(), createdAt: new Date().toISOString() },
+  { _id: 'b2', customerId: { name: 'Sara Khan' }, driverId: { userId: { name: 'Usman' } }, vehicleId: { make: 'Honda', model: 'Civic' }, tripType: 'intercity', pickupLocation: { address: 'Faisalabad' }, totalAmount: 7000, commission: 560, status: 'active', startDate: new Date().toISOString(), createdAt: new Date().toISOString() },
+  { _id: 'b3', customerId: { name: 'Hamza Butt' }, driverId: { userId: { name: 'Tariq' } }, vehicleId: { make: 'Toyota', model: 'Prado' }, tripType: 'city_day', pickupLocation: { address: 'Jhang' }, totalAmount: 10000, commission: 800, status: 'pending', startDate: new Date().toISOString(), createdAt: new Date().toISOString() },
 ];
 
 export default function BookingsPage() {
@@ -26,7 +26,7 @@ export default function BookingsPage() {
   useEffect(() => { fetchBookings(); }, [status]);
 
   const filtered = bookings.filter(b =>
-    b.riderId?.name?.toLowerCase().includes(search.toLowerCase()) ||
+    b.customerId?.name?.toLowerCase().includes(search.toLowerCase()) ||
     b.pickupLocation?.address?.toLowerCase().includes(search.toLowerCase())
   );
 
@@ -49,7 +49,7 @@ export default function BookingsPage() {
       </div>
 
       <div className="filters">
-        <input placeholder="Search rider, location..." value={search} onChange={e => setSearch(e.target.value)} style={{ minWidth: 260 }} />
+        <input placeholder="Search customer, location..." value={search} onChange={e => setSearch(e.target.value)} style={{ minWidth: 260 }} />
         <select value={status} onChange={e => setStatus(e.target.value)}>
           <option value="">All Status</option>
           <option value="pending">Pending</option>
@@ -69,7 +69,7 @@ export default function BookingsPage() {
             <thead>
               <tr>
                 <th>ID</th>
-                <th>Rider</th>
+                <th>Customer</th>
                 <th>Driver</th>
                 <th>Vehicle</th>
                 <th>Trip Type</th>
@@ -84,7 +84,7 @@ export default function BookingsPage() {
               {filtered.map(b => (
                 <tr key={b._id}>
                   <td style={{ fontFamily: 'monospace', fontSize: 11 }}>#{b._id.slice(-6).toUpperCase()}</td>
-                  <td>{b.riderId?.name}</td>
+                  <td>{b.customerId?.name}</td>
                   <td>{b.driverId?.userId?.name || '—'}</td>
                   <td>{b.vehicleId?.make} {b.vehicleId?.model}</td>
                   <td>{b.tripType?.replace('_', ' ')}</td>

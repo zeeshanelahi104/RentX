@@ -14,7 +14,7 @@ import SignupScreen from '../screens/auth/SignupScreen';
 import SelectRoleScreen from '../screens/auth/SelectRoleScreen';
 
 // Role-based Tabs
-import RiderTabs from './RiderTabs';
+import CustomerTabs from './CustomerTabs';
 import DriverTabs from './DriverTabs';
 
 // Shared screens (navigated to from tabs)
@@ -27,6 +27,8 @@ import HelpSupportScreen from '../screens/shared/HelpSupportScreen';
 import AboutScreen from '../screens/shared/AboutScreen';
 import DriverOnboardingScreen from '../screens/driver/DriverOnboardingScreen';
 import AddVehicleScreen from '../screens/driver/AddVehicleScreen';
+import EditProfileScreen from '../screens/shared/EditProfileScreen';
+import SubscriptionScreen from '../screens/driver/SubscriptionScreen';
 
 const Stack = createStackNavigator();
 
@@ -75,6 +77,8 @@ export default function AppNavigator() {
             <Stack.Screen name="Rating" component={RatingScreen} />
             <Stack.Screen name="HelpSupport" component={HelpSupportScreen} />
             <Stack.Screen name="About" component={AboutScreen} />
+            <Stack.Screen name="EditProfile" component={EditProfileScreen} />
+            <Stack.Screen name="Subscription" component={SubscriptionScreen} />
           </>
         ) : user.role === 'driver' ? (
           // ── DRIVER ROLE, ONBOARDED ──
@@ -86,11 +90,13 @@ export default function AppNavigator() {
             <Stack.Screen name="Rating" component={RatingScreen} />
             <Stack.Screen name="HelpSupport" component={HelpSupportScreen} />
             <Stack.Screen name="About" component={AboutScreen} />
+            <Stack.Screen name="EditProfile" component={EditProfileScreen} />
+            <Stack.Screen name="Subscription" component={SubscriptionScreen} />
           </>
         ) : (
-          // ── RIDER ROLE ──
+          // ── CUSTOMER ROLE ──
           <>
-            <Stack.Screen name="RiderTabs" component={RiderTabs} />
+            <Stack.Screen name="CustomerTabs" component={CustomerTabs} />
             <Stack.Screen name="VehicleDetail" component={VehicleDetailScreen} />
             <Stack.Screen name="Booking" component={BookingScreen} />
             <Stack.Screen name="BookingConfirm" component={BookingConfirmScreen} />
@@ -98,6 +104,7 @@ export default function AppNavigator() {
             <Stack.Screen name="Rating" component={RatingScreen} />
             <Stack.Screen name="HelpSupport" component={HelpSupportScreen} />
             <Stack.Screen name="About" component={AboutScreen} />
+            <Stack.Screen name="EditProfile" component={EditProfileScreen} />
           </>
         )}
       </Stack.Navigator>

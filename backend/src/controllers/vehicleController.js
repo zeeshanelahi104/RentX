@@ -7,6 +7,13 @@ const addVehicle = async (req, res, next) => {
     const driver = await Driver.findOne({ userId: req.user._id });
     if (!driver) return res.status(404).json({ success: false, message: 'Driver profile not found' });
 
+    // One vehicle per driver account — each subscription covers exactly one
+    // listing, so a driver wanting a second vehicle needs a second account.
+    const existingVehicle = await Vehicle.findOne({ driverId: driver._id });
+    if (existingVehicle) {
+      return res.status(400).json({ success: false, message: 'ہر ڈرائیور صرف ایک گاڑی رجسٹر کر سکتا ہے' });
+    }
+
     const { make, model, year, color, plateNumber, type, seats, features, rates, city } = req.body;
 
     const vehicle = await Vehicle.create({
@@ -55,6 +62,15 @@ const getVehicles = async (req, res, next) => {
   try {
     const { city, type, tripType, date, seats } = req.query;
 
+    // Lazy expiry sweep: flip any driver whose subscription has silently
+    // lapsed since we last checked. Runs on this endpoint specifically
+    // because it's the highest-traffic read, so this keeps the cached
+    // subscriptionStatus field correct without a cron job.
+    await Driver.updateMany(
+      { subscriptionStatus: 'active', subscriptionExpiresAt: { $lt: new Date() } },
+      { subscriptionStatus: 'expired' }
+    );
+
     const filter = { isAvailable: true };
     if (city) filter.city = city;
     if (type) filter.type = type;
@@ -63,12 +79,12 @@ const getVehicles = async (req, res, next) => {
     const vehicles = await Vehicle.find(filter)
       .populate({
         path: 'driverId',
-        match: { isVerified: true },
+        match: { isVerified: true, subscriptionStatus: 'active' },
         populate: { path: 'userId', select: 'name rating profilePhoto' },
       })
       .sort({ rating: -1 });
 
-    // Filter out vehicles whose driver is not verified
+    // Filter out vehicles whose driver is not verified or not subscribed
     const verified = vehicles.filter(v => v.driverId !== null);
 
     res.json({ success: true, count: verified.length, vehicles: verified });

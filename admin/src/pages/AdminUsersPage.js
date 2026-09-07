@@ -4,7 +4,7 @@ import { listAdmins, createAdmin, updateAdmin, toggleAdminActive } from '../api'
 const ALL_PERMISSIONS = [
   { key: 'manage_drivers', label: 'Manage Drivers' },
   { key: 'manage_bookings', label: 'Manage Bookings' },
-  { key: 'manage_users', label: 'Manage Riders' },
+  { key: 'manage_users', label: 'Manage Customers' },
   { key: 'view_revenue', label: 'View Revenue' },
   { key: 'manage_admins', label: 'Manage Admins' },
 ];

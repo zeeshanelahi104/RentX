@@ -27,11 +27,15 @@ const createBooking = async (req, res, next) => {
 
     const rateKey = RATE_MAP[tripType];
     const totalAmount = vehicle.rates[rateKey] * (tripType === 'airport' ? 1 : totalDays);
-    const commission = Math.round(totalAmount * 0.15);
-    const driverEarning = totalAmount - commission;
+    // [DISABLED: COMMISSION_MODEL] — uncomment to re-enable 8% per-booking commission
+    // const commission = Math.round(totalAmount * 0.08);
+    // const driverEarning = totalAmount - commission;
+    // [END DISABLED: COMMISSION_MODEL]
+    const commission = 0;
+    const driverEarning = totalAmount;
 
     const booking = await Booking.create({
-      riderId: req.user._id,
+      customerId: req.user._id,
       driverId: vehicle.driverId._id,
       vehicleId,
       tripType,
@@ -61,11 +65,11 @@ const createBooking = async (req, res, next) => {
   }
 };
 
-// GET /api/bookings/my-bookings (rider)
+// GET /api/bookings/my-bookings (customer)
 const getMyBookings = async (req, res, next) => {
   try {
     const { status } = req.query;
-    const filter = { riderId: req.user._id };
+    const filter = { customerId: req.user._id };
     if (status) filter.status = status;
 
     const bookings = await Booking.find(filter)
@@ -90,7 +94,7 @@ const getDriverBookings = async (req, res, next) => {
     if (status) filter.status = status;
 
     const bookings = await Booking.find(filter)
-      .populate('riderId', 'name phone rating profilePhoto')
+      .populate('customerId', 'name phone rating profilePhoto')
       .populate('vehicleId', 'make model year photos')
       .sort({ createdAt: -1 });
 
@@ -104,14 +108,14 @@ const getDriverBookings = async (req, res, next) => {
 const getBookingById = async (req, res, next) => {
   try {
     const booking = await Booking.findById(req.params.id)
-      .populate('riderId', 'name phone rating profilePhoto')
+      .populate('customerId', 'name phone rating profilePhoto')
       .populate('vehicleId')
       .populate({ path: 'driverId', populate: { path: 'userId', select: 'name phone rating profilePhoto' } });
 
     if (!booking) return res.status(404).json({ success: false, message: 'Booking not found' });
 
     const isOwner =
-      booking.riderId._id.toString() === req.user._id.toString() ||
+      booking.customerId._id.toString() === req.user._id.toString() ||
       booking.driverId.userId._id.toString() === req.user._id.toString();
 
     if (!isOwner) return res.status(403).json({ success: false, message: 'Access denied' });
@@ -134,8 +138,8 @@ const acceptBooking = async (req, res, next) => {
     booking.acceptedAt = new Date();
     await booking.save();
 
-    await notify(booking.riderId, NOTIFICATIONS.bookingAccepted(req.user.name));
-    getIO()?.to(`user_${booking.riderId}`).emit('booking_accepted', { bookingId: booking._id });
+    await notify(booking.customerId, NOTIFICATIONS.bookingAccepted(req.user.name));
+    getIO()?.to(`user_${booking.customerId}`).emit('booking_accepted', { bookingId: booking._id });
 
     res.json({ success: true, booking });
   } catch (err) {
@@ -155,8 +159,8 @@ const startTrip = async (req, res, next) => {
     booking.startedAt = new Date();
     await booking.save();
 
-    await notify(booking.riderId, NOTIFICATIONS.tripStarted());
-    getIO()?.to(`user_${booking.riderId}`).emit('trip_started', { bookingId: booking._id });
+    await notify(booking.customerId, NOTIFICATIONS.tripStarted());
+    getIO()?.to(`user_${booking.customerId}`).emit('trip_started', { bookingId: booking._id });
 
     res.json({ success: true, booking });
   } catch (err) {
@@ -181,8 +185,8 @@ const completeTrip = async (req, res, next) => {
       $inc: { totalTrips: 1, totalEarnings: booking.driverEarning },
     });
 
-    await notify(booking.riderId, NOTIFICATIONS.tripCompleted());
-    getIO()?.to(`user_${booking.riderId}`).emit('trip_completed', { bookingId: booking._id });
+    await notify(booking.customerId, NOTIFICATIONS.tripCompleted());
+    getIO()?.to(`user_${booking.customerId}`).emit('trip_completed', { bookingId: booking._id });
 
     res.json({ success: true, booking });
   } catch (err) {
@@ -202,17 +206,17 @@ const cancelBooking = async (req, res, next) => {
     }
 
     const driver = await Driver.findOne({ userId: req.user._id });
-    const isRider = booking.riderId.toString() === req.user._id.toString();
+    const isCustomer = booking.customerId.toString() === req.user._id.toString();
     const isDriver = driver && booking.driverId.toString() === driver._id.toString();
 
-    if (!isRider && !isDriver) return res.status(403).json({ success: false, message: 'Access denied' });
+    if (!isCustomer && !isDriver) return res.status(403).json({ success: false, message: 'Access denied' });
 
     booking.status = 'cancelled';
-    booking.cancelledBy = isRider ? 'rider' : 'driver';
+    booking.cancelledBy = isCustomer ? 'customer' : 'driver';
     booking.cancellationReason = reason;
     await booking.save();
 
-    const notifyId = isRider ? booking.driverId : booking.riderId;
+    const notifyId = isCustomer ? booking.driverId : booking.customerId;
     await notify(notifyId, NOTIFICATIONS.bookingCancelled());
 
     res.json({ success: true, booking });
@@ -231,17 +235,17 @@ const rateBooking = async (req, res, next) => {
       return res.status(400).json({ success: false, message: 'Can only rate completed bookings' });
     }
 
-    const isRider = booking.riderId.toString() === req.user._id.toString();
+    const isCustomer = booking.customerId.toString() === req.user._id.toString();
 
-    if (isRider) {
-      booking.riderRating = { score, comment };
+    if (isCustomer) {
+      booking.customerRating = { score, comment };
       // Update driver's rating
       const driverUser = await User.findById(booking.driverId.userId);
       await driverUser.updateRating(score);
     } else {
       booking.driverRating = { score, comment };
-      const rider = await User.findById(booking.riderId);
-      await rider.updateRating(score);
+      const customer = await User.findById(booking.customerId);
+      await customer.updateRating(score);
     }
 
     await booking.save();

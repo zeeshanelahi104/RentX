@@ -12,7 +12,7 @@ export const register = async (data: {
   name: string;
   email: string;
   password: string;
-  role: 'rider' | 'driver';
+  role: 'customer' | 'driver';
   city: string;
 }) => {
   const res = await api.post('/auth/register', data);
@@ -24,12 +24,12 @@ export const login = async (email: string, password: string) => {
   return storeToken(res);
 };
 
-export const googleAuth = async (idToken: string, role?: 'rider' | 'driver', city?: string) => {
+export const googleAuth = async (idToken: string, role?: 'customer' | 'driver', city?: string) => {
   const res = await api.post('/auth/google', { idToken, role, city });
   return storeToken(res);
 };
 
-export const completeProfile = (data: { role: 'rider' | 'driver'; city: string }) =>
+export const completeProfile = (data: { role: 'customer' | 'driver'; city: string }) =>
   api.patch('/auth/complete-profile', data);
 
 export const getMe = () => api.get('/auth/me');

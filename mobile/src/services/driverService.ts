@@ -5,7 +5,15 @@ export const onboardDriver = (data: {
   licenseNumber?: string;
   city: string;
   bio?: string;
+  referralCode?: string;
 }) => api.post('/drivers/onboard', data);
+
+export const updateDriverProfile = (data: {
+  cnicNumber?: string;
+  licenseNumber?: string;
+  city?: string;
+  bio?: string;
+}) => api.patch('/drivers/profile', data);
 
 export const uploadDriverDocs = (formData: FormData) =>
   api.post('/drivers/upload-docs', formData, {
@@ -20,3 +28,8 @@ export const updateLocation = (lat: number, lng: number) =>
   api.patch('/drivers/location', { lat, lng });
 
 export const getEarnings = () => api.get('/drivers/earnings/summary');
+
+export const getSubscriptionStatus = () => api.get('/drivers/subscription');
+
+export const initiateSubscriptionPayment = (method?: string) =>
+  api.post('/drivers/subscription/pay', { method });

@@ -53,7 +53,7 @@ export default function BookingHistoryScreen({ navigation }: any) {
         <Text style={styles.amount}>PKR {item.totalAmount?.toLocaleString()}</Text>
         <Text style={styles.date}>{new Date(item.startDate).toLocaleDateString('ur-PK')}</Text>
       </View>
-      {item.status === 'completed' && !item.riderRating && (
+      {item.status === 'completed' && !item.customerRating && (
         <TouchableOpacity style={styles.rateBtn} onPress={() => navigation.navigate('Rating', { bookingId: item._id })}>
           <Icon name="star-outline" size={16} color={COLORS.secondary} />
           <Text style={styles.rateBtnText}>ریٹنگ دیں</Text>

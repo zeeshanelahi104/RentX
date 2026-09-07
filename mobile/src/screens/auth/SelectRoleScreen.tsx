@@ -9,12 +9,12 @@ import { completeProfile } from '../../services/authService';
 import { useAuthStore } from '../../store/authStore';
 
 const ROLES = [
-  { id: 'rider', label: 'رائیڈر', labelEn: 'Rider', desc: 'گاڑی بک کریں' },
+  { id: 'customer', label: 'کسٹمر', labelEn: 'Customer', desc: 'گاڑی بک کریں' },
   { id: 'driver', label: 'ڈرائیور', labelEn: 'Driver', desc: 'گاڑی کرایے پر دیں' },
 ];
 
 export default function SelectRoleScreen() {
-  const [role, setRole] = useState<'rider' | 'driver'>('rider');
+  const [role, setRole] = useState<'customer' | 'driver'>('customer');
   const [city, setCity] = useState('Chiniot');
   const [loading, setLoading] = useState(false);
   const { user, setUser } = useAuthStore();

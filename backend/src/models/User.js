@@ -26,8 +26,8 @@ const userSchema = new mongoose.Schema(
     },
     role: {
       type: String,
-      enum: ['rider', 'driver', 'admin', 'superadmin'],
-      default: 'rider',
+      enum: ['customer', 'driver', 'admin', 'superadmin'],
+      default: 'customer',
     },
     googleId: {
       type: String,

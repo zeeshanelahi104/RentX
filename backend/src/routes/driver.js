@@ -4,15 +4,21 @@ const { protect, requireDriver } = require('../middleware/auth');
 const { upload } = require('../config/cloudinary');
 const {
   onboardDriver,
+  updateDriverProfile,
   uploadDocs,
   getMyDriverProfile,
   toggleOnline,
   updateLocation,
   getDriverById,
   getEarnings,
+  getSubscriptionStatus,
+  initiateSubscriptionPayment,
 } = require('../controllers/driverController');
 
 router.post('/onboard', protect, onboardDriver);
+router.patch('/profile', protect, requireDriver, updateDriverProfile);
+router.get('/subscription', protect, requireDriver, getSubscriptionStatus);
+router.post('/subscription/pay', protect, requireDriver, initiateSubscriptionPayment);
 
 router.post('/upload-docs', protect, (req, res, next) => {
   req.uploadFolder = 'driver_docs';

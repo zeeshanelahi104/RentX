@@ -13,8 +13,8 @@ export default function DashboardPage() {
     api.get('/admin/stats').then(r => setStats(r.data.stats)).catch(() => {
       // Mock data for development when backend isn't set up
       setStats({
-        totalBookings: 142, totalRevenue: 213000, commission: 31950,
-        activeDrivers: 38, pendingVerification: 7, totalRiders: 89,
+        totalBookings: 142, totalRevenue: 213000, commission: 17040,
+        activeDrivers: 38, pendingVerification: 7, totalCustomers: 89,
         todayBookings: 8, thisMonthRevenue: 87000,
         revenueChart: { labels: ['Jan','Feb','Mar','Apr','May','Jun'], data: [12000,18000,22000,31000,45000,87000] },
         bookingsByStatus: { pending: 12, accepted: 8, active: 5, completed: 110, cancelled: 7 },
@@ -49,7 +49,7 @@ export default function DashboardPage() {
           <div className="sub">This month: PKR {stats.thisMonthRevenue?.toLocaleString()}</div>
         </div>
         <div className="stat-card orange">
-          <div className="label">Platform Commission (15%)</div>
+          <div className="label">Platform Commission (8%)</div>
           <div className="value">PKR {stats.commission?.toLocaleString()}</div>
           <div className="sub">Your earnings</div>
         </div>
@@ -64,8 +64,8 @@ export default function DashboardPage() {
           <div className="sub">Pending verification: {stats.pendingVerification}</div>
         </div>
         <div className="stat-card blue">
-          <div className="label">Total Riders</div>
-          <div className="value">{stats.totalRiders}</div>
+          <div className="label">Total Customers</div>
+          <div className="value">{stats.totalCustomers}</div>
         </div>
         <div className="stat-card red">
           <div className="label">Pending Bookings</div>

@@ -40,10 +40,10 @@ export default function EarningsScreen() {
       </View>
 
       <View style={styles.infoCard}>
-        <Icon name="information-outline" size={20} color={COLORS.primary} />
+        <Icon name="credit-card-outline" size={20} color={COLORS.primary} />
         <View style={{ flex: 1, marginLeft: 10 }}>
-          <Text style={styles.infoTitle}>کمیشن کا طریقہ</Text>
-          <Text style={styles.infoText}>RentX ہر بکنگ سے 15% کمیشن لیتا ہے۔ باقی 85% آپ کی کمائی ہے۔</Text>
+          <Text style={styles.infoTitle}>سبسکرپشن ماڈل</Text>
+          <Text style={styles.infoText}>RentX اب کمیشن نہیں لیتا۔ اپنی گاڑی نظر آنے کے لیے ماہانہ PKR 3000 سبسکرپشن ادا کریں۔ پہلا مہینہ مفت ہے۔</Text>
         </View>
       </View>
     </ScrollView>
