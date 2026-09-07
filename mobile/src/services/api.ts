@@ -3,6 +3,10 @@ import { Platform } from 'react-native';
 import Constants from 'expo-constants';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
+// Set to false to always use the deployed backend below, even in dev.
+// TODO: flip back to true once ready to test against the deployed backend again.
+const USE_LOCAL_BACKEND = true;
+
 // Deployed backend — used whenever we're not actively connected to a local
 // Metro dev server (i.e. any standalone/dev-client build not started via
 // `expo start`, and any production build).
@@ -19,12 +23,7 @@ const getLocalHost = () => {
   return Platform.OS === 'android' ? '10.0.2.2' : 'localhost';
 };
 
-// Only use the local backend when actually running against a Metro dev
-// server (hostUri is present) — otherwise (standalone builds, or a dev
-// client launched without `expo start`) always hit the deployed backend.
-const isConnectedToDevServer = !!Constants.expoConfig?.hostUri;
-
-export const BASE_URL = __DEV__ && isConnectedToDevServer
+export const BASE_URL = USE_LOCAL_BACKEND
   ? `http://${getLocalHost()}:5000/api`
   : DEPLOYED_API_URL;
 

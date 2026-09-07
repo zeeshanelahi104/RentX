@@ -1,5 +1,6 @@
 const Vehicle = require('../models/Vehicle');
 const Driver = require('../models/Driver');
+const Booking = require('../models/Booking');
 
 // POST /api/vehicles
 const addVehicle = async (req, res, next) => {
@@ -117,13 +118,40 @@ const updateVehicle = async (req, res, next) => {
 
     if (!vehicle) return res.status(404).json({ success: false, message: 'Vehicle not found' });
 
-    const allowed = ['color', 'features', 'rates', 'isAvailable'];
+    // plateNumber is intentionally excluded — it's the vehicle's legal identity
+    // and shouldn't be silently swapped without a re-verification step.
+    const allowed = ['make', 'model', 'year', 'color', 'type', 'seats', 'city', 'features', 'rates', 'isAvailable'];
     allowed.forEach(field => {
       if (req.body[field] !== undefined) vehicle[field] = req.body[field];
     });
 
     await vehicle.save();
     res.json({ success: true, vehicle });
+  } catch (err) {
+    next(err);
+  }
+};
+
+// DELETE /api/vehicles/:id
+const deleteVehicle = async (req, res, next) => {
+  try {
+    const driver = await Driver.findOne({ userId: req.user._id });
+    const vehicle = await Vehicle.findOne({ _id: req.params.id, driverId: driver._id });
+
+    if (!vehicle) return res.status(404).json({ success: false, message: 'Vehicle not found' });
+
+    const activeBooking = await Booking.findOne({
+      vehicleId: vehicle._id,
+      status: { $in: ['pending', 'accepted', 'active'] },
+    });
+    if (activeBooking) {
+      return res.status(400).json({ success: false, message: 'جاری بکنگ کے دوران گاڑی حذف نہیں کی جا سکتی' });
+    }
+
+    await Vehicle.deleteOne({ _id: vehicle._id });
+    await Driver.findByIdAndUpdate(driver._id, { $pull: { vehicles: vehicle._id } });
+
+    res.json({ success: true });
   } catch (err) {
     next(err);
   }
@@ -142,4 +170,4 @@ const getMyVehicles = async (req, res, next) => {
   }
 };
 
-module.exports = { addVehicle, uploadVehiclePhotos, getVehicles, getVehicleById, updateVehicle, getMyVehicles };
+module.exports = { addVehicle, uploadVehiclePhotos, getVehicles, getVehicleById, updateVehicle, deleteVehicle, getMyVehicles };

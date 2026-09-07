@@ -15,6 +15,8 @@ export const addVehicle = (data: any) => api.post('/vehicles', data);
 
 export const updateVehicle = (id: string, data: any) => api.patch(`/vehicles/${id}`, data);
 
+export const deleteVehicle = (id: string) => api.delete(`/vehicles/${id}`);
+
 export const uploadVehiclePhotos = (id: string, formData: FormData) =>
   api.post(`/vehicles/${id}/photos`, formData, {
     headers: { 'Content-Type': 'multipart/form-data' },

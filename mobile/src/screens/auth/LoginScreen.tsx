@@ -4,6 +4,7 @@ import {
   TextInput, KeyboardAvoidingView, Platform, ScrollView, ActivityIndicator,
 } from 'react-native';
 import { MaterialCommunityIcons as Icon } from '@expo/vector-icons';
+import GoogleIcon from '../../components/GoogleIcon';
 import { COLORS } from '../../constants/colors';
 import { showAlert } from '../../utils/alert';
 import { login, googleAuth } from '../../services/authService';
@@ -107,7 +108,7 @@ export default function LoginScreen({ navigation }: any) {
             onPress={() => promptAsync()}
             disabled={!request || loading || !isGoogleAuthConfigured}
           >
-            <Icon name="google" size={20} color={COLORS.text} />
+            <GoogleIcon size={20} />
             <Text style={styles.googleButtonText}>Google سے لاگ ان کریں</Text>
           </TouchableOpacity>
 

@@ -4,6 +4,7 @@ import {
   TextInput, KeyboardAvoidingView, Platform, ScrollView, ActivityIndicator,
 } from 'react-native';
 import { MaterialCommunityIcons as Icon } from '@expo/vector-icons';
+import GoogleIcon from '../../components/GoogleIcon';
 import { COLORS } from '../../constants/colors';
 import { CITIES } from '../../constants/index';
 import { showAlert } from '../../utils/alert';
@@ -177,7 +178,7 @@ export default function SignupScreen({ navigation }: any) {
             onPress={() => promptAsync()}
             disabled={!request || loading || !isGoogleAuthConfigured}
           >
-            <Icon name="google" size={20} color={COLORS.text} />
+            <GoogleIcon size={20} />
             <Text style={styles.googleButtonText}>Google سے سائن اپ کریں</Text>
           </TouchableOpacity>
 

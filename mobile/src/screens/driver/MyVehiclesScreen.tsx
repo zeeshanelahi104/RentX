@@ -2,7 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, FlatList, TouchableOpacity, ActivityIndicator, Dimensions } from 'react-native';
 import { MaterialCommunityIcons as Icon } from '@expo/vector-icons';
 import { COLORS } from '../../constants/colors';
-import { getMyVehicles, updateVehicle } from '../../services/vehicleService';
+import { getMyVehicles, updateVehicle, deleteVehicle } from '../../services/vehicleService';
+import { showAlert } from '../../utils/alert';
 import AspectImage from '../../components/AspectImage';
 
 const CARD_WIDTH = Dimensions.get('window').width - 32; // matches FlatList's 16px horizontal padding
@@ -26,6 +27,22 @@ export default function MyVehiclesScreen({ navigation }: any) {
     fetchVehicles();
   };
 
+  const handleDelete = (vehicle: any) => {
+    showAlert('گاڑی حذف کریں؟', `${vehicle.year} ${vehicle.make} ${vehicle.model} کو ہمیشہ کے لیے حذف کر دیا جائے گا۔`, [
+      { text: 'نہیں' },
+      {
+        text: 'حذف کریں', style: 'destructive', onPress: async () => {
+          try {
+            await deleteVehicle(vehicle._id);
+            fetchVehicles();
+          } catch (e: any) {
+            showAlert('خرابی', e.message);
+          }
+        },
+      },
+    ]);
+  };
+
   const renderVehicle = ({ item }: any) => (
     <View style={styles.card}>
       <AspectImage uri={item.photos?.[0] || 'https://via.placeholder.com/300x150'} width={CARD_WIDTH} />
@@ -42,6 +59,19 @@ export default function MyVehiclesScreen({ navigation }: any) {
         <View style={styles.priceRow}>
           <Text style={styles.priceLabel}>شہر: </Text>
           <Text style={styles.priceVal}>PKR {item.rates?.cityPerDay?.toLocaleString()}/دن</Text>
+        </View>
+        <View style={styles.actionRow}>
+          <TouchableOpacity
+            style={styles.editBtn}
+            onPress={() => navigation.navigate('EditVehicle', { vehicle: item, onUpdated: fetchVehicles })}
+          >
+            <Icon name="pencil" size={16} color={COLORS.primary} />
+            <Text style={styles.editBtnText}>ترمیم کریں</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.deleteBtn} onPress={() => handleDelete(item)}>
+            <Icon name="delete-outline" size={16} color={COLORS.danger} />
+            <Text style={styles.deleteBtnText}>حذف کریں</Text>
+          </TouchableOpacity>
         </View>
       </View>
     </View>
@@ -98,6 +128,11 @@ const styles = StyleSheet.create({
   priceRow: { flexDirection: 'row', alignItems: 'center', marginTop: 8 },
   priceLabel: { fontSize: 14, color: COLORS.textSecondary },
   priceVal: { fontSize: 14, fontWeight: '700', color: COLORS.primary },
+  actionRow: { flexDirection: 'row', gap: 10, marginTop: 12 },
+  editBtn: { flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6, borderWidth: 1.5, borderColor: COLORS.primary, borderRadius: 8, paddingVertical: 10 },
+  editBtnText: { fontSize: 13, fontWeight: '600', color: COLORS.primary },
+  deleteBtn: { flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6, borderWidth: 1.5, borderColor: COLORS.danger, borderRadius: 8, paddingVertical: 10 },
+  deleteBtnText: { fontSize: 13, fontWeight: '600', color: COLORS.danger },
   empty: { alignItems: 'center', paddingTop: 80, gap: 14 },
   emptyText: { fontSize: 16, color: COLORS.muted },
   addVehicleBtn: { backgroundColor: COLORS.primary, borderRadius: 10, paddingHorizontal: 20, paddingVertical: 12 },

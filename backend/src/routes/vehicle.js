@@ -8,6 +8,7 @@ const {
   getVehicles,
   getVehicleById,
   updateVehicle,
+  deleteVehicle,
   getMyVehicles,
 } = require('../controllers/vehicleController');
 
@@ -16,6 +17,7 @@ router.post('/', protect, requireDriver, addVehicle);
 router.get('/my-vehicles', protect, requireDriver, getMyVehicles);
 router.get('/:id', protect, getVehicleById);
 router.patch('/:id', protect, requireDriver, updateVehicle);
+router.delete('/:id', protect, requireDriver, deleteVehicle);
 router.post('/:id/photos', protect, requireDriver, (req, res, next) => {
   req.uploadFolder = 'vehicles';
   next();

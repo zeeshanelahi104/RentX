@@ -34,6 +34,9 @@ export default function DriverDashboardScreen({ navigation }: any) {
   };
 
   const handleToggle = async (val: boolean) => {
+    if (!driver?.vehicles?.length) {
+      return showAlert('خرابی', 'آنلائن ہونے کے لیے پہلے اپنی گاڑی کی تفصیلات شامل کریں');
+    }
     try {
       const res = await toggleOnline();
       setIsOnline(res.data.isOnline);
@@ -103,10 +106,12 @@ export default function DriverDashboardScreen({ navigation }: any) {
           <Text style={styles.greeting}>السلام علیکم</Text>
           <Text style={styles.name}>{user?.name}</Text>
         </View>
-        <View style={styles.onlineToggle}>
-          <Text style={styles.onlineLabel}>{isOnline ? 'آنلائن' : 'آف لائن'}</Text>
-          <Switch value={isOnline} onValueChange={handleToggle} trackColor={{ true: '#A5D6A7', false: '#ccc' }} thumbColor={isOnline ? '#fff' : '#fff'} />
-        </View>
+        {!!driver?.vehicles?.length && (
+          <View style={styles.onlineToggle}>
+            <Text style={styles.onlineLabel}>{isOnline ? 'آنلائن' : 'آف لائن'}</Text>
+            <Switch value={isOnline} onValueChange={handleToggle} trackColor={{ true: '#A5D6A7', false: '#ccc' }} thumbColor={isOnline ? '#fff' : '#fff'} />
+          </View>
+        )}
       </View>
 
       {/* Status Banner */}

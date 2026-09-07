@@ -27,6 +27,7 @@ import HelpSupportScreen from '../screens/shared/HelpSupportScreen';
 import AboutScreen from '../screens/shared/AboutScreen';
 import DriverOnboardingScreen from '../screens/driver/DriverOnboardingScreen';
 import AddVehicleScreen from '../screens/driver/AddVehicleScreen';
+import EditVehicleScreen from '../screens/driver/EditVehicleScreen';
 import EditProfileScreen from '../screens/shared/EditProfileScreen';
 import SubscriptionScreen from '../screens/driver/SubscriptionScreen';
 
@@ -73,6 +74,7 @@ export default function AppNavigator() {
             <Stack.Screen name="DriverOnboarding" component={DriverOnboardingScreen} />
             <Stack.Screen name="DriverTabs" component={DriverTabs} />
             <Stack.Screen name="AddVehicle" component={AddVehicleScreen} />
+            <Stack.Screen name="EditVehicle" component={EditVehicleScreen} />
             <Stack.Screen name="Chat" component={ChatScreen} />
             <Stack.Screen name="Rating" component={RatingScreen} />
             <Stack.Screen name="HelpSupport" component={HelpSupportScreen} />
@@ -86,6 +88,7 @@ export default function AppNavigator() {
             <Stack.Screen name="DriverTabs" component={DriverTabs} />
             <Stack.Screen name="DriverOnboarding" component={DriverOnboardingScreen} />
             <Stack.Screen name="AddVehicle" component={AddVehicleScreen} />
+            <Stack.Screen name="EditVehicle" component={EditVehicleScreen} />
             <Stack.Screen name="Chat" component={ChatScreen} />
             <Stack.Screen name="Rating" component={RatingScreen} />
             <Stack.Screen name="HelpSupport" component={HelpSupportScreen} />
