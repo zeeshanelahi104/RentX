@@ -3,9 +3,8 @@ import { Platform } from 'react-native';
 import Constants from 'expo-constants';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-// Set to false to always use the deployed backend below, even in dev.
-// TODO: flip back to true once ready to test against the deployed backend again.
-const USE_LOCAL_BACKEND = true;
+// Set to true to always use the local backend below, for local dev/testing.
+const USE_LOCAL_BACKEND = false;
 
 // Deployed backend — used whenever we're not actively connected to a local
 // Metro dev server (i.e. any standalone/dev-client build not started via

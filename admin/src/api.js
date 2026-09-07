@@ -1,6 +1,14 @@
 import axios from 'axios';
 
-const api = axios.create({ baseURL: '/api' });
+// In local dev, CRA's "proxy" field in package.json forwards relative /api
+// calls to the backend — but that only works with `npm start`'s own dev
+// server. A static hosted deploy (Netlify, Vercel, etc.) has no proxy at
+// all, so relative /api calls would just hit the frontend's own domain.
+// REACT_APP_API_URL (see .env.example) is inlined at build time by CRA and
+// lets each deploy target point at its own backend without a code change.
+const api = axios.create({
+  baseURL: process.env.REACT_APP_API_URL || '/api',
+});
 
 api.interceptors.request.use(config => {
   const token = localStorage.getItem('rentx_admin_token');
